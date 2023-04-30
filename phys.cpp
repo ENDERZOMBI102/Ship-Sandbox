@@ -1,10 +1,12 @@
-#include "phys.h"
-
 #include <algorithm>
 #include <cmath>
-#include <GL/gl.h>
+#include <glad/glad.h>
 #include <iostream>
+
 #include "render.h"
+
+#include "phys.h"
+
 
 // W     W    OOO    RRRR     L        DDDD
 // W     W   O   O   R   RR   L        D  DDD
@@ -450,7 +452,7 @@ void phys::spring::update()
 void phys::spring::damping(float amount)
 {
     vec2f springdir = (a->pos - b->pos).normalise();
-    springdir *= (a->pos - a->lastpos - (b->pos - b->lastpos)).dot(springdir) * amount;   // relative velocity • spring direction = projected velocity, amount = amount of projected velocity that remains after damping
+    springdir *= (a->pos - a->lastpos - (b->pos - b->lastpos)).dot(springdir) * amount;   // relative velocity ï¿½ spring direction = projected velocity, amount = amount of projected velocity that remains after damping
     a->lastpos += springdir;
     b->lastpos -= springdir;
 }

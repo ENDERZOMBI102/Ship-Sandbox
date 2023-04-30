@@ -8,7 +8,6 @@
  **************************************************************/
 
 #include <cmath>
-#include <map>
 #include <GLFW/glfw3.h>
 #include <IL/il.h>
 #include <IL/ilu.h>

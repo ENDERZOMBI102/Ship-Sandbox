@@ -16,7 +16,7 @@
 
 // Quake <3
 
-inline float fast_inv_sqrt(float x)
+inline float fast_inv_sqrt(float x) // NOTE: Firm: outdated by rsqrtss
 {
     union {float f; unsigned long ul;} y;
     y.f = x;

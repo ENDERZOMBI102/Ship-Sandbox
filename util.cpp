@@ -28,7 +28,7 @@ Json::Value jsonParseFile(std::string filename)
     }
     else
     {
-        std::cout << "In file " << filename << ": Parsing error(s):\n" << reader.getFormatedErrorMessages();
+        std::cout << "In file " << filename << ": Parsing error(s):\n" << reader.getFormattedErrorMessages();
         return Json::Value();
     }
 }

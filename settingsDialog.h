@@ -1,4 +1,4 @@
-/*#ifndef SETTINGSDIALOG_H
+#ifndef SETTINGSDIALOG_H
 #define SETTINGSDIALOG_H
 
 //(*Headers(settingsDialog)
@@ -63,4 +63,3 @@ class settingsDialog: public wxDialog
 };
 
 #endif
-*/

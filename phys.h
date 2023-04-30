@@ -96,7 +96,7 @@ namespace phys
         friend class spring;
         friend class world;
         friend class ship;
-        static const float radius = 0.4f;
+        constexpr static const float radius = 0.4f;
         vec2 pos;
         vec2 lastpos;
         vec2 force;

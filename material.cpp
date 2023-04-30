@@ -1,6 +1,6 @@
 #include "material.h"
 
-#include <sstream>
+#include <iostream>
 
 
 int hex2int(std::string str)
