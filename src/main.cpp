@@ -7,12 +7,15 @@
  * License:
  **************************************************************/
 
+#define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
 #include "IL/il.h"
 #include "IL/ilu.h"
 #include "game.h"
+#include "glad/glad.h"
 #include "util.h"
 #include <cmath>
+#include <iostream>
 #include <sstream>
 
 int scroll_delta = 0;
@@ -139,6 +142,13 @@ int main()
     int nframes = 0;
 
     glfwMakeContextCurrent(window);
+
+    /* Initialize glad */
+    if (! gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
 
     game gm;
     gm.loadShip("ship.png");
