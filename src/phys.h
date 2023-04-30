@@ -23,29 +23,29 @@ namespace phys
         std::vector <spring*> springs;
         std::vector <ship*> ships;
         BVHNode *collisionTree;
-        float waterheight(float x);
-        float oceanfloorheight(float x);
+        double waterheight(double x);
+        double oceanfloorheight(double x);
         void doSprings(double dt);
         vec2 gravity;
         void buildBVHTree(bool splitInX, std::vector<point*> &pointlist, BVHNode *thisnode, int depth = 1);
     public:
-        float *oceandepthbuffer;
-        float buoyancy;
-        float strength;
-        float waterpressure;
-        float waveheight;
-        float seadepth;
+        double *oceandepthbuffer;
+        double buoyancy;
+        double strength;
+        double waterpressure;
+        double waveheight;
+        double seadepth;
         bool showstress;
         bool quickwaterfix;
         bool xraymode;
-        float time;
+        double time;
         void update(double dt);
         void render(double left, double right, double bottom, double top);
         void renderLand(double left, double right, double bottom, double top);
         void renderWater(double left, double right, double bottom, double top);
         void destroyAt(vec2 pos);
         void drawTo(vec2 target);
-        world(vec2 _gravity = vec2(0, -9.8), double _buoyancy = 4, double _strength = 0.01);
+        explicit world(vec2 _gravity = vec2(0, -9.8), double _buoyancy = 4, double _strength = 0.01);
         ~world();
     };
 
@@ -54,16 +54,16 @@ namespace phys
         springCalculateTask(world *_wld, int _first, int _last);
         world *wld;
         int first, last;
-        virtual void process();
+        void process() override;
     };
 
     struct world::pointIntegrateTask: scheduler::task
     {
-        pointIntegrateTask(world *_wld, int _first, int _last, float _dt);
+        pointIntegrateTask(world *_wld, int _first, int _last, double _dt);
         world *wld;
-        float dt;
+        double dt;
         int first, last;
-        virtual void process();
+        void process() override;
     };
 
 
@@ -85,7 +85,7 @@ namespace phys
         void gravitateWater(double dt);
         void balancePressure(double dt);
 
-        ship(world *_parent);
+        explicit ship(world *_parent);
         ~ship();
         void update(double dt);
     };
@@ -96,7 +96,7 @@ namespace phys
         friend class spring;
         friend class world;
         friend class ship;
-        constexpr static const float radius = 0.4f;
+        constexpr static const double radius = 0.4f;
         vec2 pos;
         vec2 lastpos;
         vec2 force;
@@ -113,9 +113,9 @@ namespace phys
         void breach();  // set to leaking and remove any incident triangles
         void update(double dt);
         vec2 getPos();
-        vec3f getColour(vec3f basecolour);
+        [[nodiscard]] vec3f getColour(vec3f basecolour) const;
         AABB getAABB();
-        void render();
+        void render() const;
     };
 
     class spring
@@ -131,7 +131,7 @@ namespace phys
         spring(world *_parent, point *_a, point *_b, material *_mtl, double _length = -1);
         ~spring();
         void update();
-        void damping(float amount);
+        void damping(double amount);
         void render(bool isStressed = false);
         bool isStressed();
         bool isBroken();
@@ -140,10 +140,10 @@ namespace phys
     struct AABB
     {
         vec2 bottomleft, topright;
-        AABB() {}
+        AABB() = default;
         AABB(vec2 _bottomleft, vec2 _topright);
         void extendTo(AABB other);
-        void render();
+        void render() const;
     };
 
     struct BVHNode

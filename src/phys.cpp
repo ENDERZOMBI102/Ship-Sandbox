@@ -31,27 +31,24 @@ void phys::world::update(double dt)
 {
     time += dt;
     // Advance simulation for points: (velocity and forces)
-    for (unsigned int i = 0; i < points.size(); i++)
-        points[i]->update(dt);
+    for ( auto& point : points )
+        point->update(dt);
     // Iterate the spring relaxation (can tune this parameter, or make it scale automatically depending on free time)
     doSprings(dt);
     // Check if any springs exceed their breaking strain:
-    for (std::vector<spring*>::iterator iter = springs.begin(); iter != springs.end();)
+    for ( auto spr : springs )
     {
-        spring *spr = *iter;
-        iter++;
         if (spr->isBroken())        // have to delete after erasure - else there is a possibility of
             delete spr;             // other objects accessing a bad pointer during this cleanup
     }
     // Tell each ship to update all of its water stuff
-    for (unsigned int i = 0; i < ships.size(); i++)
-        ships[i]->update(dt);
+    for ( auto& ship : ships )
+        ship->update(dt);
 }
 
 void phys::world::doSprings(double dt)
 {
-    int nchunks = springScheduler.getNThreads();
-    int springchunk = springs.size() / nchunks + 1;
+    auto springchunk = springs.size() / springScheduler.getNThreads() + 1;
     for (int outiter = 0; outiter < 3; outiter++)
     {
         for (int iteration = 0; iteration < 8; iteration++)
@@ -62,7 +59,7 @@ void phys::world::doSprings(double dt)
             }
             springScheduler.wait();
         }
-        float dampingamount = (1 - pow(0.0, dt)) * 0.5;
+        double dampingamount = (1 - pow(0.0, dt)) * 0.5;
         for (unsigned int i = 0; i < springs.size(); i++)
             springs[i]->damping(dampingamount);
     }
@@ -80,7 +77,7 @@ void phys::world::springCalculateTask::process()
         wld->springs[i]->update();
 }
 
-phys::world::pointIntegrateTask::pointIntegrateTask(world *_wld, int _first, int _last, float _dt)
+phys::world::pointIntegrateTask::pointIntegrateTask(world *_wld, int _first, int _last, double _dt)
 {
     wld = _wld;
     first = _first;
@@ -123,14 +120,14 @@ void phys::world::render(double left, double right, double bottom, double top)
     //buildBVHTree(true, points, collisionTree);
 }
 
-void swapf(float &x, float &y)
+void swapf(double &x, double &y)
 {
-    float temp = x;
+    double temp = x;
     x = y;
     y = temp;
 }
 
-float medianOf3(float a, float b, float c)
+double medianOf3(double a, double b, double c)
 {
     if (a < b)
         swapf(a, b);
@@ -159,7 +156,7 @@ void phys::world::buildBVHTree(bool splitInX, std::vector<point*> &pointlist, BV
     }
     else
     {
-        float pivotline = splitInX ?
+        double pivotline = splitInX ?
             medianOf3(pointlist[0]->pos.x, pointlist[npoints / 2]->pos.x, pointlist[npoints - 1]->pos.x) :
             medianOf3(pointlist[0]->pos.y, pointlist[npoints / 2]->pos.y, pointlist[npoints - 1]->pos.y);
         std::vector<point*> listL;
@@ -209,17 +206,17 @@ void phys::world::renderWater(double left, double right, double bottom, double t
     }
 }
 
-float phys::world::oceanfloorheight(float x)
+double phys::world::oceanfloorheight(double x)
 {
     /*x += 1024.f;
     x = x - 2048.f * floorf(x / 2048.f);
-    float t = x - floorf(x);
+    double t = x - floorf(x);
     return oceandepthbuffer[(int)floorf(x)] * (1 - t) + oceandepthbuffer[((int)ceilf(x)) % 2048] * t;*/
     return (sinf(x * 0.005f) * 10.f + sinf(x * 0.015f) * 6.f - sin(x * 0.0011f) * 45.f) - seadepth;
 }
 
 // Function of time and x (though time is constant during the update step, so no need to parameterise it)
-float phys::world::waterheight(float x)
+double phys::world::waterheight(double x)
 {
     return (sinf(x * 0.1f + time) * 0.5f + sinf(x * 0.3f - time * 1.1f) * 0.3f) * waveheight;
 }
@@ -227,15 +224,10 @@ float phys::world::waterheight(float x)
 // Destroy all points within a 0.5m radius (could parameterise the radius but...)
 void phys::world::destroyAt(vec2f pos)
 {
-    for (std::vector<point*>::iterator iter = points.begin(); iter != points.end();)
+    for ( auto p : points )
     {
-        point *p = *iter;
-        iter++;
         if ((p->pos - pos).length() < 0.5f)
-        {
             delete p;           // have to remove reference before deleting, else other cleanup code will use bad memory!
-            iter--;
-        }
     }
 }
 
@@ -319,7 +311,7 @@ void phys::point::update(double dt)
     // Apply verlet integration:
     pos += (pos - lastpos) + force * (dt * dt / mass);
     // Collision with seafloor:
-    float floorheight = wld->oceanfloorheight(pos.x);
+    double floorheight = wld->oceanfloorheight(pos.x);
     if (pos.y < floorheight)
     {
         vec2f dir = vec2f(floorheight - wld->oceanfloorheight(pos.x + 0.01f), 0.01f).normalise();   // -1 / derivative  => perpendicular to surface!
@@ -334,7 +326,7 @@ vec2f phys::point::getPos()
     return pos;
 }
 
-vec3f phys::point::getColour(vec3f basecolour)
+vec3f phys::point::getColour(vec3f basecolour) const
 {
    double wetness = fmin(water, 1) * 0.7;
    return basecolour * (1 - wetness) + vec3f(0, 0, 0.8) * wetness;
@@ -343,15 +335,11 @@ vec3f phys::point::getColour(vec3f basecolour)
 void phys::point::breach()
 {
     isLeaking = true;
-    for (std::set<ship::triangle*>::iterator iter = tris.begin(); iter != tris.end();)
-    {
-        ship::triangle *t = *iter;
-        iter++;
+    for ( auto t : tris )
         delete t;
-    }
 }
 
-void phys::point::render()
+void phys::point::render() const
 {
     // Put a blue blob on leaking nodes (was more for debug purposes, but looks better IMO)
     if (isLeaking)
@@ -370,7 +358,7 @@ double phys::point::getPressure()
 
 phys::AABB phys::point::getAABB()
 {
-    return phys::AABB(pos - vec2(radius, radius), pos + vec2(radius, radius));
+    return {pos - vec2(radius, radius), pos + vec2(radius, radius)};
 }
 
 phys::point::~point()
@@ -378,20 +366,15 @@ phys::point::~point()
     // get rid of any attached triangles:
     breach();
     // remove any springs attached to this point:
-    for (std::vector<spring*>::iterator iter = wld->springs.begin(); iter != wld->springs.end();)
+    for (auto spr : wld->springs )
     {
-        spring *spr = *iter;
-        iter++;
         if (spr->a == this || spr->b == this)
-        {
-            delete spr;
-            iter--;
-        }
+          delete spr;
     }
     // remove any references:
-    for (unsigned int i = 0; i < wld->ships.size(); i++)
-        wld->ships[i]->points.erase(this);
-    std::vector<point*>::iterator iter = std::find(wld->points.begin(), wld->points.end(), this);
+    for ( auto& ship : wld->ships )
+        ship->points.erase(this);
+    auto iter = std::find(wld->points.begin(), wld->points.end(), this);
     if (iter != wld->points.end())
         wld->points.erase(iter);
 }
@@ -425,15 +408,14 @@ phys::spring::~spring()
     a->breach();
     b->breach();
     // Scour out any references to this spring
-    for (unsigned int i = 0; i < wld->ships.size(); i++)
+    for ( auto shp : wld->ships )
     {
-        ship *shp = wld->ships[i];
         if (shp->adjacentnodes.find(a) != shp->adjacentnodes.end())
             shp->adjacentnodes[a].erase(b);
         if (shp->adjacentnodes.find(b) != shp->adjacentnodes.end())
             shp->adjacentnodes[b].erase(a);
     }
-    std::vector <spring*>::iterator iter = std::find(wld->springs.begin(), wld->springs.end(), this);
+    auto iter = std::find(wld->springs.begin(), wld->springs.end(), this);
     if (iter != wld->springs.end())
         wld->springs.erase(iter);
 }
@@ -442,13 +424,13 @@ void phys::spring::update()
 {
     // Try to space the two points by the equilibrium length (need to iterate to actually achieve this for all points, but it's FAAAAST for each step)
     vec2f correction_dir = (b->pos - a->pos);
-    float currentlength = correction_dir.length();
+    double currentlength = correction_dir.length();
     correction_dir *= (length - currentlength) / (length * (a->mtl->mass + b->mtl->mass) * 0.85); // * 0.8 => 25% overcorrection (stiffer, converges faster)
     a->pos -= correction_dir * b->mtl->mass;    // if b is heavier, a moves more.
     b->pos += correction_dir * a->mtl->mass;    // (and vice versa...)
 }
 
-void phys::spring::damping(float amount)
+void phys::spring::damping(double amount)
 {
     vec2f springdir = (a->pos - b->pos).normalise();
     springdir *= (a->pos - a->lastpos - (b->pos - b->lastpos)).dot(springdir) * amount;   // relative velocity � spring direction = projected velocity, amount = amount of projected velocity that remains after damping
@@ -515,9 +497,8 @@ void phys::ship::update(double dt)
 void phys::ship::leakWater(double dt)
 {
     // Stuff some water into all the leaking nodes, if they're not under too much pressure
-   for (std::set<point*>::iterator iter = points.begin(); iter != points.end(); iter++)
+   for (auto p : points )
    {
-        point *p = *iter;
         double pressure = p->getPressure();
         if (p->isLeaking && p->pos.y < wld->waterheight(p->pos.x) && p->water < 1.5)
         {
@@ -530,13 +511,10 @@ void phys::ship::gravitateWater(double dt)
 {
     // Water flows into adjacent nodes in a quantity proportional to the cos of angle the beam makes
     // against gravity (parallel with gravity => 1 (full flow), perpendicular = 0)
-    for (std::map<point*, std::set<point*> >::iterator iter = adjacentnodes.begin();
-         iter != adjacentnodes.end(); iter++)
+   for ( auto [a, second] : adjacentnodes)
     {
-        point *a = iter->first;
-        for (std::set<point*>::iterator second = iter->second.begin(); second != iter->second.end(); second++)
+        for ( auto b : second )
         {
-            point *b = *second;
             double cos_theta = (b->pos - a->pos).normalise().dot(wld->gravity.normalise());
             if (cos_theta > 0)
             {
@@ -553,15 +531,12 @@ void phys::ship::balancePressure(double dt)
 {
     // If there's too much water in this node, try and push it into the others
     // (This needs to iterate over multiple frames for pressure waves to spread through water)
-    for (std::map<point*, std::set<point*> >::iterator iter = adjacentnodes.begin();
-         iter != adjacentnodes.end(); iter++)
+    for ( auto [a, second] : adjacentnodes)
     {
-        point *a = iter->first;
-        if (a->water < 1)   // if water content is not above threshold, no need to force water out
+        if (a->water < 1)   // if water content is not above the threshold, no need to force water out
             continue;
-        for (std::set<point*>::iterator second = iter->second.begin(); second != iter->second.end(); second++)
+        for ( auto b : second )
         {
-            point *b = *second;
             double correction = (b->water - a->water) * 8 * dt; // can tune this number; value of 1 means will equalise in 1 second.
             a->water += correction;
             b->water -= correction;
@@ -571,9 +546,8 @@ void phys::ship::balancePressure(double dt)
 
 void phys::ship::render()
 {
-    for (std::set<ship::triangle*>::iterator iter = triangles.begin(); iter != triangles.end(); iter++)
+    for ( auto t : triangles )
     {
-        triangle *t = *iter;
         render::triangle(t->a->pos, t->b->pos, t->c->pos,
                          t->a->getColour(t->a->mtl->colour),
                          t->b->getColour(t->b->mtl->colour),
@@ -581,7 +555,7 @@ void phys::ship::render()
     }
 }
 
-phys::ship::~ship()
+phys::ship::~ship() // NOLINT(modernize-use-equals-default)
 {
     /*for (unsigned int i = 0; i < triangles.size(); i++)
         delete triangles[i];*/
@@ -624,16 +598,16 @@ void phys::AABB::extendTo(phys::AABB other)
         topright.y = other.topright.y;
 }
 
-void phys::AABB::render()
+void phys::AABB::render() const
 {
     render::box(bottomleft, topright);
 }
 
-phys::BVHNode* phys::BVHNode::allocateTree(int depth)
+phys::BVHNode* phys::BVHNode::allocateTree(int depth) // NOLINT(misc-no-recursion)
 {
     if (depth <= 0)
-        return 0;
-    BVHNode *thisnode = new BVHNode;
+        return nullptr;
+    auto* thisnode = new BVHNode;
     thisnode->l = allocateTree(depth - 1);
     thisnode->r = allocateTree(depth - 1);
     return thisnode;
