@@ -1,10 +1,9 @@
 #ifndef _MATERIAL_H_
 #define _MATERIAL_H_
 
-#include <json/json.h>
-#include <string>
 #include "vec.h"
-
+#include "json/json.h"
+#include <string>
 
 struct material
 {

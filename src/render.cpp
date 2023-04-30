@@ -1,6 +1,6 @@
 #include "render.h"
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 
 void render::triangle(vec2 a, vec2 b, vec2 c)
 {

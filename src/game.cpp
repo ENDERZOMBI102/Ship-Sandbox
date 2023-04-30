@@ -1,12 +1,11 @@
 #include "game.h"
 
-#include <IL/il.h>
-#include <IL/ilu.h>
+#include "IL/il.h"
+#include "IL/ilu.h"
+#include "util.h"
 #include <iostream>
 #include <map>
 #include <string>
-#include "util.h"
-
 
 const int directions[8][2] = {
 { 1,  0},

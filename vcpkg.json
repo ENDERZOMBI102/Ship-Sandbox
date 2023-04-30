@@ -3,15 +3,11 @@
   "version-string" : "1.0.0",
   "builtin-baseline" : "20759c873e6b1ae1968e86d42ba70cf2bde0f7a4",
   "dependencies" : [
-      { "name" : "wxwidgets"  },
-      { "name" : "tinythread" },
-      { "name" : "devil"      },
-      { "name" : "glfw3"      },
-      { "name" : "jsoncpp"    }
+      { "name" : "devil"   },
+      { "name" : "glfw3"   },
+      { "name" : "jsoncpp" }
   ],
   "overrides" : [
-      { "name" : "wxwidgets",  "version" : "3.2.2.1"  },
-      { "name" : "tinythread", "version" : "1.1#5"    },
       { "name" : "devil",      "version" : "1.8.0#10" },
       { "name" : "glfw3",      "version" : "3.3.8#2"  },
       { "name" : "jsoncpp",    "version" : "1.9.5"    }

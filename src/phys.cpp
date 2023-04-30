@@ -1,6 +1,5 @@
+#include "glad/glad.h"
 #include <algorithm>
-#include <cmath>
-#include <glad/glad.h>
 #include <iostream>
 
 #include "render.h"

@@ -7,12 +7,12 @@
  * License:
  **************************************************************/
 
-#include <cmath>
-#include <GLFW/glfw3.h>
-#include <IL/il.h>
-#include <IL/ilu.h>
+#include "GLFW/glfw3.h"
+#include "IL/il.h"
+#include "IL/ilu.h"
 #include "game.h"
 #include "util.h"
+#include <cmath>
 #include <sstream>
 
 int scroll_delta = 0;

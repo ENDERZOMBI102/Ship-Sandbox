@@ -5,7 +5,7 @@
 
 scheduler::scheduler()
 {
-    nthreads = tthread::thread::hardware_concurrency();
+    nthreads = std::thread::hardware_concurrency();
     for (int i = 0; i < nthreads; i++)
     {
         threadPool.push_back(new thread(this));
@@ -45,22 +45,22 @@ int scheduler::getNThreads()
 
 void scheduler::semaphore::signal()
 {
-    tthread::lock_guard<tthread::mutex> lock(m);
+    std::lock_guard<std::mutex> lock(m);
     ++count_;
     condition.notify_one();
 }
 
 void scheduler::semaphore::wait()
 {
-    tthread::lock_guard<tthread::mutex> lock(m);
+    std::unique_lock<std::mutex> lock(m);
     while (!count_)
-        condition.wait(m);
+        condition.wait( lock );
     --count_;
 }
 
 // scheduler::thread
 
-scheduler::thread::thread(scheduler *_parent): tthread::thread(scheduler::thread::enter, this)
+scheduler::thread::thread(scheduler *_parent): std::thread(scheduler::thread::enter, this)
 {
     parent = _parent;
     detach();
