@@ -43,7 +43,7 @@ public:
     vec2 screen2world(vec2);
 
     std::string lastFilename;
-    float *oceandepthbuffer;
+    double *oceandepthbuffer;
 
     phys::world *wld;
     game();
