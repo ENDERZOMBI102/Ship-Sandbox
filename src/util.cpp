@@ -2,7 +2,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 Json::Value jsonParseFile(std::string filename)
 {
@@ -49,11 +48,4 @@ charbuffer getFileContents(std::string filename)
     result.buffer = buffer;
     result.length = length;
     return result;
-}
-
-template <typename T> std::string tostring(T x)
-{
-    std::stringstream ss;
-    ss << x;
-    return ss.str();
 }
