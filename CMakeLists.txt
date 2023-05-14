@@ -4,6 +4,13 @@ project( ShipSandbox LANGUAGES CXX )
 set( CMAKE_CXX_STANDARD_REQUIRED 20 )
 set( CMAKE_CXX_STANDARD 20 )
 
+
+if (UNIX)
+	list( APPEND CMAKE_PREFIX_PATH "/home/linuxbrew/.linuxbrew/opt/glfw" )
+	message( "path: ${CMAKE_PREFIX_PATH}" )
+endif()
+
+
 add_executable( ShipSandbox
 	src/main.cpp
 	src/game.cpp
@@ -20,20 +27,29 @@ add_executable( ShipSandbox
 	src/util.h
 	src/vec.cpp
 	src/vec.h
+	src/RmlBackend/RmlUi_Platform_GLFW.cpp
+	src/RmlBackend/RmlUi_Platform_GLFW.h
+	src/RmlBackend/RmlUi_Renderer_GL2.cpp
+	src/RmlBackend/RmlUi_Renderer_GL2.h
 )
-target_compile_definitions( ShipSandbox PRIVATE "$<$<CONFIG:DEBUG>:__WXDEBUG__>" __WXMSW__ WXUSINGDLL wxUSE_UNICODE _CRT_SECURE_NO_WARNINGS )
+target_compile_definitions( ShipSandbox PRIVATE _CRT_SECURE_NO_WARNINGS )
 
 add_subdirectory( vendor/glad )
 
 #find_package( OpenGL REQUIRED )
-find_package( GLFW3 CONFIG REQUIRED )
+if ( UNIX )
+	find_package( GLFW3 CONFIG REQUIRED )
+else()
+	find_package( GLFW3 CONFIG REQUIRED )
+endif()
 find_package( jsoncpp CONFIG REQUIRED )
 # devil is the actual devil, took me 3h to find this stupid solution...
 find_package( PkgConfig REQUIRED )
 pkg_check_modules( DevIL IMPORTED_TARGET REQUIRED DevIL )
 pkg_check_modules( ILU IMPORTED_TARGET REQUIRED ILU )
+find_package(RmlUi CONFIG REQUIRED)
 
-target_link_libraries( ShipSandbox PRIVATE GLAD glfw JsonCpp::JsonCpp PkgConfig::DevIL PkgConfig::ILU )
+target_link_libraries( ShipSandbox PRIVATE GLAD glfw JsonCpp::JsonCpp PkgConfig::DevIL PkgConfig::ILU RmlCore RmlDebugger )
 
 if( WIN32 )
 	target_link_libraries( ShipSandbox PRIVATE opengl32 )
