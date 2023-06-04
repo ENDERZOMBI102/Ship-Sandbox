@@ -103,8 +103,7 @@ void titanicFrame::OnMenuReloadSelected(wxCommandEvent& event)
         gm.loadShip(gm.lastFilename);
 }*/
 
-void doInput( GLFWwindow *window, game &gm )
-{
+void doInput( GLFWwindow *window, game &gm, SystemInterface_GLFW &systemInterface ) {
 
 	double xd, yd;
 	glfwGetCursorPos( window, &xd, &yd );
@@ -112,15 +111,13 @@ void doInput( GLFWwindow *window, game &gm )
 	gm.mouse.y = yd;
 	gm.mouse.ldown = glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_LEFT );
 	gm.mouse.rdown = glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_RIGHT );
-	if ( scroll_delta != 0 )
-	{
+	if ( scroll_delta != 0 ) {
 		gm.zoomsize *= pow( 0.85, scroll_delta );
 		scroll_delta = 0;
 	}
 }
 
-void scrollCallback( GLFWwindow *window, double x, double y )
-{
+void scrollCallback( GLFWwindow *window, double x, double y ) {
 	scroll_delta += y;
 }
 
@@ -146,13 +143,27 @@ int main()
 		return -1;
 	}
 
-	Rml::SetSystemInterface( new SystemInterface_GLFW() );
-	Rml::SetRenderInterface( new RenderInterface_GL2() );
+	SystemInterface_GLFW systemInterface;
+	RenderInterface_GL2 renderInterface;
+
+	Rml::SetSystemInterface( &systemInterface );
+	Rml::SetRenderInterface( &renderInterface );
 	Rml::Initialise();
+	Rml::Log::Initialise();
 	Rml::LoadFontFace( "C:/Windows/Fonts/arial.ttf" );
 
 	auto context = Rml::CreateContext( "default", Rml::Vector2i( 1024, 768) );
+	auto document = context->LoadDocument( "data/view/main.xml" );
 
+	if (! document ) {
+		Rml::Log::Message( Rml::Log::LT_ERROR, "Failed to load document!" );
+		Rml::RemoveContext( "default" );
+		Rml::Shutdown();
+		glfwTerminate();
+		return 1;
+	}
+
+	document->Show();
 
     game gm;
     gm.loadShip("ship.png");
@@ -168,14 +179,28 @@ int main()
             nframes = 0;
         }
 		context->Update();
-        doInput(window, gm);
+
+//		// Submit input events before the call to Context::Update().
+//		if (my_input->MouseMoved())
+//			context->ProcessMouseMove(mouse_pos.x, mouse_pos.y, 0);
+//
+//		// Toggle the debugger with a key binding.
+//		if (my_input->KeyPressed(KEY_F8))
+//			Rml::Debugger::SetVisible(!Rml::Debugger::IsVisible());
+
+		doInput( window, gm, systemInterface );
         gm.update();
         initgl(window, &gm);
         gm.render();
+		renderInterface.SetViewport(  gm.canvaswidth, gm.canvasheight  );
+		renderInterface.BeginFrame();
 		context->Render();
-        endgl(window, &gm);
+		renderInterface.EndFrame();
+		endgl(window, &gm);
+
         glfwPollEvents();
     }
+	document->Close();
 	Rml::RemoveContext( "default" );
 	Rml::Shutdown();
     glfwTerminate();
