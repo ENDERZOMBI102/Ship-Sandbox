@@ -63,45 +63,9 @@ auto ShipSandbox::mainLoop() -> int {
 	
 	this->window = glfwCreateWindow( 1024, 768, "Sinking Simulator", nullptr, nullptr );
 	glfwSwapInterval( 1 );
-	glfwSetScrollCallback(
-		this->window,
-		[]( GLFWwindow* _window, double _x, double _y ) -> void {
-			shipSandbox->scroll_delta += static_cast<int>( _y );
-			RmlGLFW::ProcessScrollCallback( shipSandbox->rmlContext, _x, 0 );
-		}
-	);
-	glfwSetCursorPosCallback(
-		this->window,
-		[]( GLFWwindow* _window, double _xPos, double _yPos ) -> void {
-			shipSandbox->gm.mouse.x = static_cast<int>( _xPos );
-			shipSandbox->gm.mouse.y = static_cast<int>( _yPos );
-			RmlGLFW::ProcessCursorPosCallback( shipSandbox->rmlContext, _xPos, _yPos, 0 );
-		}
-	);
-	glfwSetKeyCallback(
-		this->window,
-		[]( GLFWwindow* _window, int _key, int _scancode, int _action, int _mods ) -> void {
-			// Toggle the debugger with a key binding.
-			switch ( _key ) {
-				case GLFW_KEY_F8:
-					Rml::Debugger::SetVisible(!Rml::Debugger::IsVisible());
-					break;
-				case GLFW_KEY_F5: {
-					auto path = shipSandbox->rmlDoc->GetSourceURL();
-					Rml::Log::Message( Rml::Log::Type::LT_DEBUG, "Reloading %s", path.c_str() );
-					shipSandbox->rmlDoc->Close();
-					Rml::Factory::ClearStyleSheetCache();
-					Rml::Factory::ClearTemplateCache();
-					Rml::ReleaseTextures();
-					shipSandbox->rmlDoc = shipSandbox->rmlContext->LoadDocument( path );
-					break;
-				}
-				default:
-					break;
-			}
-			RmlGLFW::ProcessKeyCallback( shipSandbox->rmlContext, _key, _action, _mods );
-		}
-	);
+	glfwSetScrollCallback( this->window, ShipSandbox::onScroll );
+	glfwSetCursorPosCallback( this->window, ShipSandbox::onCursorPos );
+	glfwSetKeyCallback( this->window, ShipSandbox::onKey );
 	double lasttime = glfwGetTime();
 	int nframes = 0;
 
@@ -109,7 +73,7 @@ auto ShipSandbox::mainLoop() -> int {
 
 	/* Initialize glad */
 	if ( !gladLoadGLLoader( ( GLADloadproc ) glfwGetProcAddress ) ) {
-		std::cout << "Failed to initialize GLAD" << std::endl;
+		std::cerr << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
 
@@ -128,7 +92,7 @@ auto ShipSandbox::mainLoop() -> int {
 
 	auto document = this->rmlContext->LoadDocument( "data/view/main.rml" );
 
-	if ( !document ) {
+	if (! document ) {
 		Rml::Log::Message( Rml::Log::LT_ERROR, "Failed to load document!" );
 		Rml::RemoveContext( "default" );
 		Rml::Shutdown();
@@ -168,6 +132,39 @@ auto ShipSandbox::mainLoop() -> int {
 	Rml::Shutdown();
 	glfwTerminate();
 	return 0;
+}
+
+auto ShipSandbox::onScroll( GLFWwindow* /*window*/, double x, double y ) -> void {
+	shipSandbox->scroll_delta += static_cast<int>( y );
+	RmlGLFW::ProcessScrollCallback( shipSandbox->rmlContext, x, 0 );
+}
+
+auto ShipSandbox::onCursorPos( GLFWwindow* /*window*/, double xPos, double yPos ) -> void {
+	shipSandbox->gm.mouse.x = static_cast<int>( xPos );
+	shipSandbox->gm.mouse.y = static_cast<int>( yPos );
+	RmlGLFW::ProcessCursorPosCallback( shipSandbox->rmlContext, xPos, yPos, 0 );
+}
+
+auto ShipSandbox::onKey( GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int mods ) -> void {
+	// Toggle the debugger with a key binding.
+	switch ( key ) {
+		case GLFW_KEY_F8:
+			Rml::Debugger::SetVisible(!Rml::Debugger::IsVisible());
+			break;
+		case GLFW_KEY_F5: {
+			auto path = shipSandbox->rmlDoc->GetSourceURL();
+			Rml::Log::Message( Rml::Log::Type::LT_DEBUG, "Reloading %s", path.c_str() );
+			shipSandbox->rmlDoc->Close();
+			Rml::Factory::ClearStyleSheetCache();
+			Rml::Factory::ClearTemplateCache();
+			Rml::ReleaseTextures();
+			shipSandbox->rmlDoc = shipSandbox->rmlContext->LoadDocument( path );
+			break;
+		}
+		default:
+			break;
+	}
+	RmlGLFW::ProcessKeyCallback( shipSandbox->rmlContext, key, action, mods );
 }
 
 ShipSandbox* shipSandbox;

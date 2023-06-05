@@ -24,6 +24,10 @@ public:
 	auto endFrame() -> void;
 	auto handleMouse() -> void;
 	auto mainLoop() -> int;
+private:
+	static auto onScroll( GLFWwindow* window, double x, double y ) -> void;
+	static auto onCursorPos( GLFWwindow* window, double xPos, double yPos ) -> void;
+	static auto onKey( GLFWwindow* window, int key, int scancode, int action, int mods ) -> void;
 };
 
 extern ShipSandbox* shipSandbox;
