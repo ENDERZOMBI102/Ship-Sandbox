@@ -1,18 +1,16 @@
-#ifndef _MATERIAL_H_
-#define _MATERIAL_H_
+#pragma once
 
 #include "vec.h"
 #include "json/json.h"
 #include <string>
 
-struct material
-{
+class Material {
+public:
     std::string name;
     float strength;
     float mass;
-    vec3f colour;
+    vec3f color;
     bool isHull;
-    material(Json::Value);
+public:
+	explicit Material( const Json::Value& root );
 };
-
-#endif // _MATERIAL_H_

@@ -7,7 +7,7 @@
 
 class game
 {
-    std::vector <material*> materials;
+    std::vector < Material*> materials;
 public:
 
     struct

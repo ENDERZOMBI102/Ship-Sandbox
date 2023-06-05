@@ -32,9 +32,9 @@ void game::loadShip(std::string filename)
 
     int nodecount = 0, springcount = 0;
 
-    std::map<vec3f, material*> colourdict;
+    std::map<vec3f, Material*> colourdict;
     for (unsigned int i = 0; i < materials.size(); i++)
-        colourdict[materials[i]->colour] = materials[i];
+        colourdict[materials[i]->color ] = materials[i];
 
     ILuint imghandle;
     ilGenImages(1, &imghandle);
@@ -68,7 +68,7 @@ void game::loadShip(std::string filename)
                          data[(x + (height - y) * width) * 3 + 2] / 255.f);
             if (colourdict.find(colour) != colourdict.end())
             {
-                material *mtl = colourdict[colour];
+				Material*mtl = colourdict[colour];
                 points[x][y] = new phys::point(wld, vec2(x - width/2, y), mtl, mtl->isHull? 0 : 1);  // no buoyancy if it's a hull section
                 shp->points.insert(points[x][y]);
                 nodecount++;
@@ -100,7 +100,7 @@ void game::loadShip(std::string filename)
                 {
                     bool pointIsHull = a->mtl->isHull;
                     bool isHull = pointIsHull && b->mtl->isHull;
-                    material *mtl = b->mtl->isHull? a->mtl : b->mtl;    // the spring is hull iff both nodes are hull; if so we use the hull material.
+					Material*mtl = b->mtl->isHull? a->mtl : b->mtl;    // the spring is hull iff both nodes are hull; if so we use the hull Material.
                     shp->springs.insert(new phys::spring(wld, a, b, mtl, -1));
                     if (!isHull)
                     {
@@ -181,7 +181,7 @@ game::game()
 {
     Json::Value matroot = jsonParseFile("data/materials.json");
     for (unsigned int i = 0; i < matroot.size(); i++)
-        materials.push_back(new material(matroot[i]));
+        materials.push_back(new Material(matroot[i]));
     wld = new phys::world();
     loadDepth("data/depth.png");
     buoyancy = 4.0;

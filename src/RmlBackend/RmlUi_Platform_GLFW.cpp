@@ -1,5 +1,5 @@
 /*
- * This source file is part of RmlUi, the HTML/CSS Interface Middleware
+ * This source file is part of RmlUi, the HTML/CSS Interface Middleware, edited by ENDERZOMBI102
  *
  * For the latest information, see http://github.com/mikke89/RmlUi
  *
@@ -30,9 +30,9 @@
 #include <RmlUi/Core/Context.h>
 #include <RmlUi/Core/Input.h>
 #include <RmlUi/Core/Log.h>
-#include <RmlUi/Core/StringUtilities.h>
 #include <RmlUi/Core/SystemInterface.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
 
 SystemInterface_GLFW::SystemInterface_GLFW()
 {
@@ -93,6 +93,11 @@ void SystemInterface_GLFW::GetClipboardText(Rml::String& text)
 {
 	if (window)
 		text = Rml::String(glfwGetClipboardString(window));
+}
+
+bool SystemInterface_GLFW::LogMessage( Rml::Log::Type type, const Rml::String& message ) {
+	std::cout << "[" << ( type == Rml::Log::Type::LT_ALWAYS ? "Always" : type == Rml::Log::Type::LT_ERROR ? "Error" : type == Rml::Log::Type::LT_ASSERT ? "Assert" : type == Rml::Log::Type::LT_WARNING ? "Warning" : type == Rml::Log::Type::LT_INFO ? "Info" : type == Rml::Log::Type::LT_DEBUG ? "Debug" : type == Rml::Log::Type::LT_MAX ? "Max" : "Unknown" ) << "] " << message << std::endl;
+	return true;
 }
 
 bool RmlGLFW::ProcessKeyCallback(Rml::Context* context, int key, int action, int mods)

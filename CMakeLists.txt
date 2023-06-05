@@ -16,7 +16,7 @@ add_executable( ShipSandbox
 	src/game.cpp
 	src/game.h
 	src/material.cpp
-	src/material.h
+	src/material.hpp
 	src/phys.cpp
 	src/phys.h
 	src/render.cpp
@@ -31,8 +31,8 @@ add_executable( ShipSandbox
 	src/RmlBackend/RmlUi_Platform_GLFW.h
 	src/RmlBackend/RmlUi_Renderer_GL2.cpp
 	src/RmlBackend/RmlUi_Renderer_GL2.h
-	src/CGameView.cpp
-	src/CGameView.hpp
+	src/ShipSandbox.cpp
+	src/ShipSandbox.hpp
 )
 target_compile_definitions( ShipSandbox PRIVATE _CRT_SECURE_NO_WARNINGS )
 
