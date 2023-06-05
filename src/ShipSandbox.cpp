@@ -113,9 +113,7 @@ auto ShipSandbox::mainLoop() -> int {
 		return -1;
 	}
 
-	Rml::Log::Initialise();
 	Rml::SetSystemInterface( &this->systemInterface );
-	Rml::Log::Message(Rml::Log::LT_WARNING, "Test warning.");
 	Rml::SetRenderInterface( &this->renderInterface );
 	Rml::Initialise();
 
