@@ -12,9 +12,10 @@
 #include "game.hpp"
 
 class ShipSandbox {
+	friend class GameElement;
 	GLFWwindow* window{};
-	Game gm{};
 	SystemInterface_GLFW systemInterface{};
+	Game gm{};
 	RenderInterface_GL2 renderInterface{};
 	Rml::Context* rmlContext{};
 	Rml::ElementDocument* rmlDoc{};

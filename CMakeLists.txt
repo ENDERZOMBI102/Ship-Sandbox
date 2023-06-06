@@ -26,6 +26,8 @@ add_executable( ShipSandbox
 	src/RmlBackend/RmlUi_Renderer_GL2.h
 	src/ShipSandbox.cpp
 	src/ShipSandbox.hpp
+	src/GameElement.cpp
+	src/GameElement.hpp
 )
 target_compile_definitions( ShipSandbox PRIVATE _CRT_SECURE_NO_WARNINGS )
 

@@ -4,6 +4,9 @@
 
 #include "render.hpp"
 
+#include "RmlUi/Core/Core.h"
+#include "RmlUi/Core/GeometryUtilities.h"
+
 #include "phys.h"
 
 

@@ -41,9 +41,7 @@ auto ShipSandbox::beginFrame() -> void {
 }
 
 auto ShipSandbox::endFrame() -> void {
-	// Flush all the draw operations and flip the back buffer onto the screen.
-	glFlush();
-	glfwSwapBuffers( this->window );
+
 }
 
 auto ShipSandbox::handleMouse() -> void {
@@ -117,13 +115,14 @@ auto ShipSandbox::mainLoop() -> int {
 		this->rmlContext->Update();
 
 		this->gm.update();
-		this->beginFrame();
-		this->gm.render();
 		this->renderInterface.SetViewport( this->gm.canvaswidth, this->gm.canvasheight );
 		this->renderInterface.BeginFrame();
-//		this->rmlContext->Render();
+		this->rmlContext->Render();
 		this->renderInterface.EndFrame();
-		this->endFrame();
+
+		// Flush all the draw operations and flip the back buffer onto the screen.
+		glFlush();
+		glfwSwapBuffers( this->window );
 
 		glfwPollEvents();
 	}
