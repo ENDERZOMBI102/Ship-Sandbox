@@ -3,12 +3,14 @@
 //
 #include <IL/il.h>
 #include <IL/ilu.h>
-#include <RmlUi/Debugger.h>
+#include <imgui.h>
 #include <glad/glad.h>
 #include <cmath>
 #include <iostream>
 
 
+#include "ImBackend/imgui_impl_glfw.h"
+#include "ImBackend/imgui_impl_opengl2.h"
 #include "ShipSandbox.hpp"
 
 auto ShipSandbox::beginFrame() -> void {
@@ -77,32 +79,24 @@ auto ShipSandbox::mainLoop() -> int {
 		return -1;
 	}
 
-	Rml::SetSystemInterface( &this->systemInterface );
-	Rml::SetRenderInterface( &this->renderInterface );
-	Rml::Initialise();
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-	if (! (this->rmlContext = Rml::CreateContext( "default", Rml::Vector2i( 1024, 768 ) )) ) {
-		Rml::Shutdown();
-		return  -1;
-	}
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
 
-	Rml::Debugger::Initialise( this->rmlContext );
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL( window, true );
+	ImGui_ImplOpenGL2_Init();
 
-	Rml::LoadFontFace( "C:/Windows/Fonts/arial.ttf" );
-
-	auto document = this->rmlContext->LoadDocument( "data/view/main.rml" );
-
-	if (! document ) {
-		Rml::Log::Message( Rml::Log::LT_ERROR, "Failed to load document!" );
-		Rml::RemoveContext( "default" );
-		Rml::Shutdown();
-		glfwTerminate();
-		return 1;
-	}
-
-	document->Show();
+	io.Fonts->AddFontDefault();
 
 	gm.loadShip( "ship.png" );
+	bool shown = true;
 
 	while ( !glfwWindowShouldClose( this->window ) ) {
 		nframes++;
@@ -114,57 +108,49 @@ auto ShipSandbox::mainLoop() -> int {
 
 		this->handleMouse();
 
-		this->rmlContext->Update();
-
 		this->gm.update();
 		this->beginFrame();
-		this->gm.render();
-		this->renderInterface.SetViewport( this->gm.canvaswidth, this->gm.canvasheight );
-		this->renderInterface.BeginFrame();
-//		this->rmlContext->Render();
-		this->renderInterface.EndFrame();
+			this->gm.render();
+
+			// Start the Dear ImGui frame
+			ImGui_ImplOpenGL2_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+
+			ImGui::Begin("Another Window", &shown);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+				ImGui::Text("Hello from another window!");
+				if (ImGui::Button("Close Me"))
+					shown = false;
+			ImGui::End();
+
+			// Rendering
+			ImGui::Render();
+			ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+
 		this->endFrame();
 
 		glfwPollEvents();
 	}
-	document->Close();
-	Rml::RemoveContext( "default" );
-	Rml::Shutdown();
+	// Cleanup
+	ImGui_ImplOpenGL2_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
 	glfwTerminate();
 	return 0;
 }
 
 auto ShipSandbox::onScroll( GLFWwindow* /*window*/, double x, double y ) -> void {
 	shipSandbox->scroll_delta += static_cast<int>( y );
-	RmlGLFW::ProcessScrollCallback( shipSandbox->rmlContext, x, 0 );
 }
 
 auto ShipSandbox::onCursorPos( GLFWwindow* /*window*/, double xPos, double yPos ) -> void {
 	shipSandbox->gm.mouse.x = xPos;
 	shipSandbox->gm.mouse.y = yPos;
-	RmlGLFW::ProcessCursorPosCallback( shipSandbox->rmlContext, xPos, yPos, 0 );
 }
 
 auto ShipSandbox::onKey( GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int mods ) -> void {
-	// Toggle the debugger with a key binding.
-	switch ( key ) {
-		case GLFW_KEY_F8:
-			Rml::Debugger::SetVisible(!Rml::Debugger::IsVisible());
-			break;
-		case GLFW_KEY_F5: {
-			auto path = shipSandbox->rmlDoc->GetSourceURL();
-			Rml::Log::Message( Rml::Log::Type::LT_DEBUG, "Reloading %s", path.c_str() );
-			shipSandbox->rmlDoc->Close();
-			Rml::Factory::ClearStyleSheetCache();
-			Rml::Factory::ClearTemplateCache();
-			Rml::ReleaseTextures();
-			shipSandbox->rmlDoc = shipSandbox->rmlContext->LoadDocument( path );
-			break;
-		}
-		default:
-			break;
-	}
-	RmlGLFW::ProcessKeyCallback( shipSandbox->rmlContext, key, action, mods );
+	(void) 0;
 }
 
 ShipSandbox* shipSandbox;

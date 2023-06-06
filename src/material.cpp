@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <RmlUi/Core/Log.h>
 
 #include "material.hpp"
 
@@ -26,5 +25,5 @@ Material::Material( const Json::Value& root ) {
 	this->strength = root.get( "strength", 1 ).asFloat() / this->mass * 1000;
 	this->color = hex2Color( ( root.isMember( "color" ) ? root[ "color" ] : root[ "colour" ] ).asString() );  // may as well account for English spelling...
 	this->isHull = root[ "isHull" ].asBool();
-	Rml::Log::Message( Rml::Log::Type::LT_INFO, "Adding new Material: \"%s\" %s", this->name.c_str(), this->color.toString().c_str() );
+//	Rml::Log::Message( Rml::Log::Type::LT_INFO, "Adding new Material: \"%s\" %s", this->name.c_str(), this->color.toString().c_str() );
 }

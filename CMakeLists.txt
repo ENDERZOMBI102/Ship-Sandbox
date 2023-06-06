@@ -20,10 +20,10 @@ add_executable( ShipSandbox
 	src/util.hpp
 	src/vec.cpp
 	src/vec.hpp
-	src/RmlBackend/RmlUi_Platform_GLFW.cpp
-	src/RmlBackend/RmlUi_Platform_GLFW.h
-	src/RmlBackend/RmlUi_Renderer_GL2.cpp
-	src/RmlBackend/RmlUi_Renderer_GL2.h
+	src/ImBackend/imgui_impl_glfw.cpp
+	src/ImBackend/imgui_impl_glfw.h
+	src/ImBackend/imgui_impl_opengl2.cpp
+	src/ImBackend/imgui_impl_opengl2.h
 	src/ShipSandbox.cpp
 	src/ShipSandbox.hpp
 )
@@ -40,9 +40,9 @@ find_package( jsoncpp CONFIG REQUIRED )
 find_package( PkgConfig REQUIRED )
 pkg_check_modules( DevIL IMPORTED_TARGET REQUIRED DevIL )
 pkg_check_modules( ILU IMPORTED_TARGET REQUIRED ILU )
-find_package( RmlUi CONFIG REQUIRED )
+find_package( imgui CONFIG REQUIRED )
 
-target_link_libraries( ShipSandbox PRIVATE GLAD glfw JsonCpp::JsonCpp PkgConfig::DevIL PkgConfig::ILU RmlCore RmlDebugger )
+target_link_libraries( ShipSandbox PRIVATE GLAD glfw JsonCpp::JsonCpp PkgConfig::DevIL PkgConfig::ILU imgui::imgui )
 
 if( WIN32 )
 	target_link_libraries( ShipSandbox PRIVATE opengl32 )

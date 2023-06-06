@@ -6,12 +6,13 @@
 	  { "name": "devil"   },
 	  { "name": "glfw3"   },
 	  { "name": "jsoncpp" },
-	  { "name": "rmlui"   }
+	  { "name": "imgui"   }
   ],
   "overrides" : [
 	  { "name": "devil"  , "version": "1.8.0#10" },
 	  { "name": "glfw3"  , "version": "3.3.8#2"  },
 	  { "name": "jsoncpp", "version": "1.9.5"    },
-	  { "name": "jsoncpp", "version": "5.1"      }
+	  { "name": "jsoncpp", "version": "5.1"      },
+	  { "name": "imgui"  , "version": "1.89.4#1" }
   ]
 }

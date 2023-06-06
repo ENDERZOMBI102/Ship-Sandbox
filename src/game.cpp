@@ -1,12 +1,11 @@
 #include "game.hpp"
 
-#include "IL/il.h"
-#include "IL/ilu.h"
-#include "RmlUi/Core/Log.h"
-#include "util.hpp"
+#include <IL/il.h>
+#include <IL/ilu.h>
 #include <iostream>
-#include <map>
+#include <unordered_map>
 #include <string>
+#include "util.hpp"
 
 const int directions[ 8 ][ 2 ] = {
 	{  1,  0 },
@@ -117,7 +116,7 @@ void Game::loadShip( const std::string& filename ) {
 		}
 	}
 	ilDeleteImage( imghandle );
-	Rml::Log::Message( Rml::Log::LT_INFO, "Loaded ship \"%s\": %d points, %d springs.", filename.c_str(), nodecount, springcount );
+//	Rml::Log::Message( Rml::Log::LT_INFO, "Loaded ship \"%s\": %d points, %d springs.", filename.c_str(), nodecount, springcount );
 }
 
 void Game::loadDepth( const std::string& filename ) {
