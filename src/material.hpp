@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vec.h"
+#include "vec.hpp"
 #include "json/json.h"
 #include <string>
 

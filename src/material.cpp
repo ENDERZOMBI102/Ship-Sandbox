@@ -13,7 +13,7 @@ vec3f hex2Color( std::string str ) {  //  e.g. "#00FF00";
 
 	auto color = std::stoi( str, nullptr, 16 );
 
-	return {
+	return vec3f{
 		static_cast<float>( ( color & 0xFF'00'00 ) >> 16 ) / 255,  // R
 		static_cast<float>( ( color & 0x00'FF'00 ) >>  8 ) / 255,  // G
 		static_cast<float>( ( color & 0x00'00'FF ) >>  0 ) / 255   // B

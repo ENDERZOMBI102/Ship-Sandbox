@@ -2,7 +2,7 @@
 
 #include "Material.hpp"
 #include "scheduler.h"
-#include "vec.h"
+#include "vec.hpp"
 #include <map>
 #include <set>
 #include <vector>
@@ -28,7 +28,7 @@ namespace phys {
 		double waterheight( double x );
 		double oceanfloorheight( double x );
 		void doSprings( double dt );
-		vec2 gravity;
+		vec2f gravity;
 		void buildBVHTree( bool splitInX, std::vector< point* >& pointlist, BVHNode* thisnode, int depth = 1 );
 
 	public:
@@ -46,9 +46,9 @@ namespace phys {
 		void render( double left, double right, double bottom, double top );
 		void renderLand( double left, double right, double bottom, double top );
 		void renderWater( double left, double right, double bottom, double top );
-		void destroyAt( vec2 pos );
-		void drawTo( vec2 target );
-		explicit world( vec2 _gravity = vec2( 0, -9.8 ), double _buoyancy = 4, double _strength = 0.01 );
+		void destroyAt( vec2f pos );
+		void drawTo( vec2f target );
+		explicit world( vec2f _gravity = vec2f( 0, -9.8 ), double _buoyancy = 4, double _strength = 0.01 );
 		~world();
 	};
 
@@ -96,9 +96,9 @@ namespace phys {
 		friend class world;
 		friend class ship;
 		constexpr static const double radius = 0.4f;
-		vec2 pos;
-		vec2 lastpos;
-		vec2 force;
+		vec2f pos;
+		vec2f lastpos;
+		vec2f force;
 		double buoyancy;
 		double water;
 		double getPressure();
@@ -107,12 +107,12 @@ namespace phys {
 		std::set< ship::triangle* > tris;
 		Material* mtl;
 		bool isLeaking;
-		point( world* _parent, vec2 _pos, Material* _mtl, double _buoyancy );
+		point( world* _parent, vec2f _pos, Material* _mtl, double _buoyancy );
 		~point();
-		void applyForce( vec2 f );
+		void applyForce( vec2f f );
 		void breach();// set to leaking and remove any incident triangles
 		void update( double dt );
-		vec2 getPos();
+		vec2f getPos();
 		[[nodiscard]] vec3f getColor( vec3f basecolor ) const;
 		AABB getAABB();
 		void render() const;
@@ -138,9 +138,9 @@ namespace phys {
 	};
 
 	struct AABB {
-		vec2 bottomleft, topright;
+		vec2f bottomleft, topright;
 		AABB() = default;
-		AABB( vec2 _bottomleft, vec2 _topright );
+		AABB( vec2f _bottomleft, vec2f _topright );
 		void extendTo( AABB other );
 		void render() const;
 	};

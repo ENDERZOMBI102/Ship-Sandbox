@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <iostream>
 
-#include "render.h"
+#include "render.hpp"
 
 #include "phys.h"
 
@@ -72,7 +72,7 @@ phys::world::pointIntegrateTask::pointIntegrateTask( world* _wld, int _first, in
 void phys::world::pointIntegrateTask::process() {
 	for ( int i = first; i <= last; i++ ) {
 		wld->points[ i ]->pos += wld->points[ i ]->force * dt;
-		wld->points[ i ]->force = vec2( 0, 0 );
+		wld->points[ i ]->force = vec2f{ 0, 0 };
 	}
 }
 
@@ -240,7 +240,7 @@ phys::world::~world() {
 // P          OOO    IIIIIII  N     N     T
 
 // Just copies parameters into relevant fields:
-phys::point::point( world* _parent, vec2 _pos, Material* _mtl, double _buoyancy ) {
+phys::point::point( world* _parent, vec2f _pos, Material* _mtl, double _buoyancy ) {
 	wld = _parent;
 	wld->points.push_back( this );
 	pos = _pos;
@@ -270,11 +270,12 @@ void phys::point::update( double dt ) {
 	// Collision with seafloor:
 	double floorheight = wld->oceanfloorheight( pos.x );
 	if ( pos.y < floorheight ) {
-		vec2f dir = vec2f( floorheight - wld->oceanfloorheight( pos.x + 0.01f ), 0.01f ).normalise();// -1 / derivative  => perpendicular to surface!
-		pos += dir * ( floorheight - pos.y );
+		// -1 / derivative => perpendicular to surface!
+		vec2f dir = vec2f{ static_cast<float>( floorheight - wld->oceanfloorheight( pos.x + 0.01f ) ), 0.01f }.normalise();
+		pos += dir * static_cast<float>( floorheight - pos.y );
 	}
 	lastpos = newlastpos;
-	force = vec2f( 0, 0 );
+	force = vec2f{ 0, 0 };
 }
 
 vec2f phys::point::getPos() {
@@ -283,7 +284,7 @@ vec2f phys::point::getPos() {
 
 vec3f phys::point::getColor( vec3f basecolor ) const {
 	double wetness = fmin( water, 1 ) * 0.7;
-	return basecolor * ( 1 - wetness ) + vec3f( 0, 0, 0.8 ) * wetness;
+	return basecolor * static_cast<float>( 1 - wetness ) + vec3f( 0, 0, 0.8 ) * static_cast<float>( wetness );
 }
 
 void phys::point::breach() {
@@ -307,7 +308,7 @@ double phys::point::getPressure() {
 }
 
 phys::AABB phys::point::getAABB() {
-	return { pos - vec2( radius, radius ), pos + vec2( radius, radius ) };
+	return { pos - vec2f{ radius, radius }, pos + vec2f{ radius, radius } };
 }
 
 phys::point::~point() {
@@ -365,23 +366,28 @@ phys::spring::~spring() {
 }
 
 void phys::spring::update() {
-	// Try to space the two points by the equilibrium length (need to iterate to actually achieve this for all points, but it's FAAAAST for each step)
+	// Try to space the two points by the equilibrium length
+	// (need to iterate to actually achieve this for all points, but it's FAAAAST for each step)
 	vec2f correction_dir = ( b->pos - a->pos );
 	double currentlength = correction_dir.length();
-	correction_dir *= ( length - currentlength ) / ( length * ( a->mtl->mass + b->mtl->mass ) * 0.85 );// * 0.8 => 25% overcorrection (stiffer, converges faster)
-	a->pos -= correction_dir * b->mtl->mass;                                                           // if b is heavier, a moves more.
-	b->pos += correction_dir * a->mtl->mass;                                                           // (and vice versa...)
+	// * 0.8 => 25% overcorrection (stiffer, converges faster)
+	correction_dir *= static_cast<float>( ( length - currentlength ) / ( length * ( a->mtl->mass + b->mtl->mass ) * 0.85 ) );
+	// if b is heavier, a moves more.
+	a->pos -= correction_dir * b->mtl->mass;
+	// (and vice versa...)
+	b->pos += correction_dir * a->mtl->mass;
 }
 
 void phys::spring::damping( double amount ) {
 	vec2f springdir = ( a->pos - b->pos ).normalise();
-	springdir *= ( a->pos - a->lastpos - ( b->pos - b->lastpos ) ).dot( springdir ) * amount;// relative velocity � spring direction = projected velocity, amount = amount of projected velocity that remains after damping
+	// relative velocity � spring direction = projected velocity, amount = amount of projected velocity that remains after damping
+	springdir *= static_cast<float>( ( a->pos - a->lastpos - ( b->pos - b->lastpos ) ).dot( springdir ) * amount );
 	a->lastpos += springdir;
 	b->lastpos -= springdir;
 }
 
 void phys::spring::render( bool showStress ) {
-	// If member is heavily stressed, highlight it in red (ignored if world's showstress field is false)
+	// If a member is heavily stressed, highlight it in red (ignored if the world's showstress field is false)
 	glBegin( GL_LINES );
 	if ( showStress )
 		glColor3f( 1, 0, 0 );
@@ -470,41 +476,35 @@ void phys::ship::balancePressure( double dt ) {
 }
 
 void phys::ship::render() {
-	for ( auto t: triangles ) {
-		render::triangle( t->a->pos, t->b->pos, t->c->pos,
-						  t->a->getColor( t->a->mtl->color ),
-						  t->b->getColor( t->b->mtl->color ),
-						  t->c->getColor( t->c->mtl->color ) );
-	}
+	for ( auto t: this->triangles )
+		render::triangle(
+			t->a->pos, t->b->pos, t->c->pos,
+			t->a->getColor( t->a->mtl->color ),
+			t->b->getColor( t->b->mtl->color ),
+			t->c->getColor( t->c->mtl->color )
+		);
 }
 
-phys::ship::~ship()// NOLINT(modernize-use-equals-default)
-{
-	/*for (unsigned int i = 0; i < triangles.size(); i++)
-        delete triangles[i];*/
+phys::ship::~ship() {
+	for ( const auto& item: this->triangles )
+		delete item;
+	triangles.clear();
 }
 
-phys::ship::triangle::triangle( phys::ship* _parent, point* _a, point* _b, point* _c ) {
-	parent = _parent;
-	a = _a;
-	b = _b;
-	c = _c;
-	a->tris.insert( this );
-	b->tris.insert( this );
-	c->tris.insert( this );
+phys::ship::triangle::triangle( phys::ship* _parent, point* _a, point* _b, point* _c ) : parent( _parent ), a(_a), b(_b), c(_c) {
+	this->a->tris.insert( this );
+	this->b->tris.insert( this );
+	this->c->tris.insert( this );
 }
 
 phys::ship::triangle::~triangle() {
-	parent->triangles.erase( this );
-	a->tris.erase( this );
-	b->tris.erase( this );
-	c->tris.erase( this );
+	this->parent->triangles.erase( this );
+	this->a->tris.erase( this );
+	this->b->tris.erase( this );
+	this->c->tris.erase( this );
 }
 
-phys::AABB::AABB( vec2 _bottomleft, vec2 _topright ) {
-	bottomleft = _bottomleft;
-	topright = _topright;
-}
+phys::AABB::AABB( vec2f _bottomleft, vec2f _topright ) : bottomleft( _bottomleft ), topright( _topright ) { }
 
 void phys::AABB::extendTo( phys::AABB other ) {
 	if ( other.bottomleft.x < bottomleft.x )
@@ -521,8 +521,7 @@ void phys::AABB::render() const {
 	render::box( bottomleft, topright );
 }
 
-phys::BVHNode* phys::BVHNode::allocateTree( int depth )// NOLINT(misc-no-recursion)
-{
+phys::BVHNode* phys::BVHNode::allocateTree( int depth ) { // NOLINT(misc-no-recursion)
 	if ( depth <= 0 )
 		return nullptr;
 	auto* thisnode = new BVHNode;
