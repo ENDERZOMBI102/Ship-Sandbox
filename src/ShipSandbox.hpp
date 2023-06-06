@@ -28,6 +28,7 @@ private:
 	static auto onScroll( GLFWwindow* window, double x, double y ) -> void;
 	static auto onCursorPos( GLFWwindow* window, double xPos, double yPos ) -> void;
 	static auto onKey( GLFWwindow* window, int key, int scancode, int action, int mods ) -> void;
+	static auto onMouseBtn( GLFWwindow* window, int button, int action, int mods ) -> void;
 };
 
 extern ShipSandbox* shipSandbox;

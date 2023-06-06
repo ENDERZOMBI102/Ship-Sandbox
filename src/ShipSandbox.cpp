@@ -58,14 +58,15 @@ auto ShipSandbox::handleMouse() -> void {
 auto ShipSandbox::mainLoop() -> int {
 	ilInit();
 	iluInit();
-	if ( glfwInit() == -1 )
+	if (! glfwInit() )
 		return -1;
-	
+
 	this->window = glfwCreateWindow( 1024, 768, "Sinking Simulator", nullptr, nullptr );
 	glfwSwapInterval( 1 );
 	glfwSetScrollCallback( this->window, ShipSandbox::onScroll );
 	glfwSetCursorPosCallback( this->window, ShipSandbox::onCursorPos );
 	glfwSetKeyCallback( this->window, ShipSandbox::onKey );
+	glfwSetMouseButtonCallback( this->window, ShipSandbox::onMouseBtn );
 	double lasttime = glfwGetTime();
 	int nframes = 0;
 
@@ -115,14 +116,14 @@ auto ShipSandbox::mainLoop() -> int {
 		this->handleMouse();
 
 		this->rmlContext->Update();
-
 		this->gm.update();
+
 		this->beginFrame();
-		this->gm.render();
-		this->renderInterface.SetViewport( this->gm.canvaswidth, this->gm.canvasheight );
-		this->renderInterface.BeginFrame();
-//		this->rmlContext->Render();
-		this->renderInterface.EndFrame();
+			this->gm.render();
+			this->renderInterface.SetViewport( this->gm.canvaswidth, this->gm.canvasheight );
+			this->renderInterface.BeginFrame();
+//				this->rmlContext->Render();
+			this->renderInterface.EndFrame();
 		this->endFrame();
 
 		glfwPollEvents();
@@ -147,24 +148,13 @@ auto ShipSandbox::onCursorPos( GLFWwindow* /*window*/, double xPos, double yPos 
 
 auto ShipSandbox::onKey( GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int mods ) -> void {
 	// Toggle the debugger with a key binding.
-	switch ( key ) {
-		case GLFW_KEY_F8:
-			Rml::Debugger::SetVisible(!Rml::Debugger::IsVisible());
-			break;
-		case GLFW_KEY_F5: {
-			auto path = shipSandbox->rmlDoc->GetSourceURL();
-			Rml::Log::Message( Rml::Log::Type::LT_DEBUG, "Reloading %s", path.c_str() );
-			shipSandbox->rmlDoc->Close();
-			Rml::Factory::ClearStyleSheetCache();
-			Rml::Factory::ClearTemplateCache();
-			Rml::ReleaseTextures();
-			shipSandbox->rmlDoc = shipSandbox->rmlContext->LoadDocument( path );
-			break;
-		}
-		default:
-			break;
-	}
+	if ( key == GLFW_KEY_F8 && action == GLFW_PRESS )
+		Rml::Debugger::SetVisible(! Rml::Debugger::IsVisible() );
 	RmlGLFW::ProcessKeyCallback( shipSandbox->rmlContext, key, action, mods );
+}
+
+auto ShipSandbox::onMouseBtn( GLFWwindow* /*window*/, int button, int action, int mods ) -> void {
+	RmlGLFW::ProcessMouseButtonCallback( shipSandbox->rmlContext, button, action, mods );
 }
 
 ShipSandbox* shipSandbox;
