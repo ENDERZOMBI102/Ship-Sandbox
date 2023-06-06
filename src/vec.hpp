@@ -28,6 +28,14 @@ struct vec2f {
 	}
 };
 
+template<>
+struct std::hash<vec2f> {
+	size_t operator()( const vec2f& vec ) const {
+		auto hasher = hash<float>();
+		return hasher( vec.x ) + hasher( vec.y );
+	}
+};
+
 struct vec3f {
 	float x;
 	float y;
@@ -52,5 +60,13 @@ struct vec3f {
 		x = _x;
 		y = _y;
 		z = _z;
+	}
+};
+
+template<>
+struct std::hash<vec3f> {
+	size_t operator()( const vec3f& vec ) const {
+		auto hasher = hash<float>();
+		return hasher( vec.x ) + hasher( vec.y ) + hasher( vec.z );
 	}
 };
