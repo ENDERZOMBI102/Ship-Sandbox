@@ -9,11 +9,11 @@
 
 #include "RmlBackend/RmlUi_Platform_GLFW.h"
 #include "RmlBackend/RmlUi_Renderer_GL2.h"
-#include "game.h"
+#include "game.hpp"
 
 class ShipSandbox {
 	GLFWwindow* window{};
-	game gm{};
+	Game gm{};
 	SystemInterface_GLFW systemInterface{};
 	RenderInterface_GL2 renderInterface{};
 	Rml::Context* rmlContext{};

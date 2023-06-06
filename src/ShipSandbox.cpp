@@ -13,7 +13,7 @@
 
 auto ShipSandbox::beginFrame() -> void {
 	// Set the context, clear the canvas and set up all the matrices.
-	glfwGetWindowSize( this->window, &( this->gm.canvaswidth ), &( this->gm.canvasheight ) );
+	glfwGetWindowSize( this->window, &this->gm.canvaswidth, &this->gm.canvasheight );
 	glViewport( 0, 0, this->gm.canvaswidth, this->gm.canvasheight );
 	glClearColor( 0.529, 0.808, 0.980, 1 ); // (cornflower blue)
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -140,8 +140,8 @@ auto ShipSandbox::onScroll( GLFWwindow* /*window*/, double x, double y ) -> void
 }
 
 auto ShipSandbox::onCursorPos( GLFWwindow* /*window*/, double xPos, double yPos ) -> void {
-	shipSandbox->gm.mouse.x = static_cast<int>( xPos );
-	shipSandbox->gm.mouse.y = static_cast<int>( yPos );
+	shipSandbox->gm.mouse.x = xPos;
+	shipSandbox->gm.mouse.y = yPos;
 	RmlGLFW::ProcessCursorPosCallback( shipSandbox->rmlContext, xPos, yPos, 0 );
 }
 
