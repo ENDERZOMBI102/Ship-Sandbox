@@ -22,8 +22,8 @@ add_executable( ShipSandbox
 	src/vec.hpp
 	src/RmlBackend/RmlUi_Platform_GLFW.cpp
 	src/RmlBackend/RmlUi_Platform_GLFW.h
-	src/RmlBackend/RmlUi_Renderer_GL2.cpp
-	src/RmlBackend/RmlUi_Renderer_GL2.h
+	src/RmlBackend/RmlUi_Renderer_GL3.cpp
+	src/RmlBackend/RmlUi_Renderer_GL3.h
 	src/ShipSandbox.cpp
 	src/ShipSandbox.hpp
 )

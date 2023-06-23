@@ -27,188 +27,182 @@
  */
 
 #include "RmlUi_Platform_GLFW.h"
+#include <GLFW/glfw3.h>
 #include <RmlUi/Core/Context.h>
 #include <RmlUi/Core/Input.h>
 #include <RmlUi/Core/Log.h>
 #include <RmlUi/Core/SystemInterface.h>
-#include <GLFW/glfw3.h>
 #include <iostream>
 
-SystemInterface_GLFW::SystemInterface_GLFW()
-{
-	cursor_pointer = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
-	cursor_cross = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
-	cursor_text = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
+SystemInterface_GLFW::SystemInterface_GLFW() {
+	cursor_pointer = glfwCreateStandardCursor( GLFW_HAND_CURSOR );
+	cursor_cross = glfwCreateStandardCursor( GLFW_CROSSHAIR_CURSOR );
+	cursor_text = glfwCreateStandardCursor( GLFW_IBEAM_CURSOR );
 }
 
-SystemInterface_GLFW::~SystemInterface_GLFW()
-{
-	glfwDestroyCursor(cursor_pointer);
-	glfwDestroyCursor(cursor_cross);
-	glfwDestroyCursor(cursor_text);
+SystemInterface_GLFW::~SystemInterface_GLFW() {
+	glfwDestroyCursor( cursor_pointer );
+	glfwDestroyCursor( cursor_cross );
+	glfwDestroyCursor( cursor_text );
 }
 
-void SystemInterface_GLFW::SetWindow(GLFWwindow* in_window)
-{
+void SystemInterface_GLFW::SetWindow( GLFWwindow* in_window ) {
 	window = in_window;
 }
 
-double SystemInterface_GLFW::GetElapsedTime()
-{
+double SystemInterface_GLFW::GetElapsedTime() {
 	return glfwGetTime();
 }
 
-void SystemInterface_GLFW::SetMouseCursor(const Rml::String& cursor_name)
-{
+void SystemInterface_GLFW::SetMouseCursor( const Rml::String& cursor_name ) {
 	GLFWcursor* cursor = nullptr;
 
-	if (cursor_name.empty() || cursor_name == "arrow")
+	if ( cursor_name.empty() || cursor_name == "arrow" )
 		cursor = nullptr;
-	else if (cursor_name == "move")
+	else if ( cursor_name == "move" )
 		cursor = cursor_pointer;
-	else if (cursor_name == "pointer")
+	else if ( cursor_name == "pointer" )
 		cursor = cursor_pointer;
-	else if (cursor_name == "resize")
+	else if ( cursor_name == "resize" )
 		cursor = cursor_pointer;
-	else if (cursor_name == "cross")
+	else if ( cursor_name == "cross" )
 		cursor = cursor_cross;
-	else if (cursor_name == "text")
+	else if ( cursor_name == "text" )
 		cursor = cursor_text;
-	else if (cursor_name == "unavailable")
+	else if ( cursor_name == "unavailable" )
 		cursor = nullptr;
-	else if (cursor_name.starts_with("rmlui-scroll"))
+	else if ( cursor_name.starts_with( "rmlui-scroll" ) )
 		cursor = cursor_pointer;
 
-	if (window)
-		glfwSetCursor(window, cursor);
+	if ( window )
+		glfwSetCursor( window, cursor );
 }
 
-void SystemInterface_GLFW::SetClipboardText(const Rml::String& text_utf8)
-{
-	if (window)
-		glfwSetClipboardString(window, text_utf8.c_str());
+void SystemInterface_GLFW::SetClipboardText( const Rml::String& text_utf8 ) {
+	if ( window )
+		glfwSetClipboardString( window, text_utf8.c_str() );
 }
 
-void SystemInterface_GLFW::GetClipboardText(Rml::String& text)
-{
-	if (window)
-		text = Rml::String(glfwGetClipboardString(window));
+void SystemInterface_GLFW::GetClipboardText( Rml::String& text ) {
+	if ( window )
+		text = Rml::String( glfwGetClipboardString( window ) );
 }
 
 bool SystemInterface_GLFW::LogMessage( Rml::Log::Type type, const Rml::String& message ) {
-	std::cout << "[" << ( type == Rml::Log::Type::LT_ALWAYS ? "Always" : type == Rml::Log::Type::LT_ERROR ? "Error" : type == Rml::Log::Type::LT_ASSERT ? "Assert" : type == Rml::Log::Type::LT_WARNING ? "Warning" : type == Rml::Log::Type::LT_INFO ? "Info" : type == Rml::Log::Type::LT_DEBUG ? "Debug" : type == Rml::Log::Type::LT_MAX ? "Max" : "Unknown" ) << "] " << message << std::endl;
+	std::cout << "[" << ( type == Rml::Log::Type::LT_ALWAYS ? "Always" : type == Rml::Log::Type::LT_ERROR ? "Error"
+																	 : type == Rml::Log::Type::LT_ASSERT  ? "Assert"
+																	 : type == Rml::Log::Type::LT_WARNING ? "Warning"
+																	 : type == Rml::Log::Type::LT_INFO    ? "Info"
+																	 : type == Rml::Log::Type::LT_DEBUG   ? "Debug"
+																	 : type == Rml::Log::Type::LT_MAX     ? "Max"
+																										  : "Unknown" )
+			  << "] " << message << std::endl;
 	return true;
 }
 
-bool RmlGLFW::ProcessKeyCallback(Rml::Context* context, int key, int action, int mods)
-{
-	if (!context)
+bool RmlGLFW::ProcessKeyCallback( Rml::Context* context, int key, int action, int mods ) {
+	if ( !context )
 		return true;
 
 	bool result = true;
 
-	switch (action)
-	{
-	case GLFW_PRESS:
-	case GLFW_REPEAT:
-		result = context->ProcessKeyDown(RmlGLFW::ConvertKey(key), RmlGLFW::ConvertKeyModifiers(mods));
-		if (key == GLFW_KEY_ENTER || key == GLFW_KEY_KP_ENTER)
-			result &= context->ProcessTextInput('\n');
-		break;
-	case GLFW_RELEASE: result = context->ProcessKeyUp(RmlGLFW::ConvertKey(key), RmlGLFW::ConvertKeyModifiers(mods)); break;
+	switch ( action ) {
+		case GLFW_PRESS:
+		case GLFW_REPEAT:
+			result = context->ProcessKeyDown( RmlGLFW::ConvertKey( key ), RmlGLFW::ConvertKeyModifiers( mods ) );
+			if ( key == GLFW_KEY_ENTER || key == GLFW_KEY_KP_ENTER )
+				result &= context->ProcessTextInput( '\n' );
+			break;
+		case GLFW_RELEASE:
+			result = context->ProcessKeyUp( RmlGLFW::ConvertKey( key ), RmlGLFW::ConvertKeyModifiers( mods ) );
+			break;
 	}
 
 	return result;
 }
-bool RmlGLFW::ProcessCharCallback(Rml::Context* context, unsigned int codepoint)
-{
-	if (!context)
+bool RmlGLFW::ProcessCharCallback( Rml::Context* context, unsigned int codepoint ) {
+	if ( !context )
 		return true;
 
-	bool result = context->ProcessTextInput((Rml::Character)codepoint);
+	bool result = context->ProcessTextInput( ( Rml::Character ) codepoint );
 	return result;
 }
 
-bool RmlGLFW::ProcessCursorEnterCallback(Rml::Context* context, int entered)
-{
-	if (!context)
+bool RmlGLFW::ProcessCursorEnterCallback( Rml::Context* context, int entered ) {
+	if ( !context )
 		return true;
 
 	bool result = true;
-	if (!entered)
+	if ( !entered )
 		result = context->ProcessMouseLeave();
 	return result;
 }
 
-bool RmlGLFW::ProcessCursorPosCallback(Rml::Context* context, double xpos, double ypos, int mods)
-{
-	if (!context)
+bool RmlGLFW::ProcessCursorPosCallback( Rml::Context* context, double xpos, double ypos, int mods ) {
+	if ( !context )
 		return true;
 
-	bool result = context->ProcessMouseMove(int(xpos), int(ypos), RmlGLFW::ConvertKeyModifiers(mods));
+	bool result = context->ProcessMouseMove( int( xpos ), int( ypos ), RmlGLFW::ConvertKeyModifiers( mods ) );
 	return result;
 }
 
-bool RmlGLFW::ProcessMouseButtonCallback(Rml::Context* context, int button, int action, int mods)
-{
-	if (!context)
+bool RmlGLFW::ProcessMouseButtonCallback( Rml::Context* context, int button, int action, int mods ) {
+	if ( !context )
 		return true;
 
 	bool result = true;
 
-	switch (action)
-	{
-	case GLFW_PRESS: result = context->ProcessMouseButtonDown(button, RmlGLFW::ConvertKeyModifiers(mods)); break;
-	case GLFW_RELEASE: result = context->ProcessMouseButtonUp(button, RmlGLFW::ConvertKeyModifiers(mods)); break;
+	switch ( action ) {
+		case GLFW_PRESS:
+			result = context->ProcessMouseButtonDown( button, RmlGLFW::ConvertKeyModifiers( mods ) );
+			break;
+		case GLFW_RELEASE:
+			result = context->ProcessMouseButtonUp( button, RmlGLFW::ConvertKeyModifiers( mods ) );
+			break;
 	}
 	return result;
 }
 
-bool RmlGLFW::ProcessScrollCallback(Rml::Context* context, double yoffset, int mods)
-{
-	if (!context)
+bool RmlGLFW::ProcessScrollCallback( Rml::Context* context, double yoffset, int mods ) {
+	if ( !context )
 		return true;
 
-	bool result = context->ProcessMouseWheel(-float(yoffset), RmlGLFW::ConvertKeyModifiers(mods));
+	bool result = context->ProcessMouseWheel( -float( yoffset ), RmlGLFW::ConvertKeyModifiers( mods ) );
 	return result;
 }
 
-void RmlGLFW::ProcessFramebufferSizeCallback(Rml::Context* context, int width, int height)
-{
-	if (context)
-		context->SetDimensions(Rml::Vector2i(width, height));
+void RmlGLFW::ProcessFramebufferSizeCallback( Rml::Context* context, int width, int height ) {
+	if ( context )
+		context->SetDimensions( Rml::Vector2i( width, height ) );
 }
 
-void RmlGLFW::ProcessContentScaleCallback(Rml::Context* context, float xscale)
-{
-	if (context)
-		context->SetDensityIndependentPixelRatio(xscale);
+void RmlGLFW::ProcessContentScaleCallback( Rml::Context* context, float xscale ) {
+	if ( context )
+		context->SetDensityIndependentPixelRatio( xscale );
 }
 
-int RmlGLFW::ConvertKeyModifiers(int glfw_mods)
-{
+int RmlGLFW::ConvertKeyModifiers( int glfw_mods ) {
 	int key_modifier_state = 0;
 
-	if (GLFW_MOD_SHIFT & glfw_mods)
+	if ( GLFW_MOD_SHIFT & glfw_mods )
 		key_modifier_state |= Rml::Input::KM_SHIFT;
 
-	if (GLFW_MOD_CONTROL & glfw_mods)
+	if ( GLFW_MOD_CONTROL & glfw_mods )
 		key_modifier_state |= Rml::Input::KM_CTRL;
 
-	if (GLFW_MOD_ALT & glfw_mods)
+	if ( GLFW_MOD_ALT & glfw_mods )
 		key_modifier_state |= Rml::Input::KM_ALT;
 
-	if (GLFW_MOD_CAPS_LOCK & glfw_mods)
+	if ( GLFW_MOD_CAPS_LOCK & glfw_mods )
 		key_modifier_state |= Rml::Input::KM_SCROLLLOCK;
 
-	if (GLFW_MOD_NUM_LOCK & glfw_mods)
+	if ( GLFW_MOD_NUM_LOCK & glfw_mods )
 		key_modifier_state |= Rml::Input::KM_NUMLOCK;
 
 	return key_modifier_state;
 }
 
-Rml::Input::KeyIdentifier RmlGLFW::ConvertKey(int glfw_key)
-{
+Rml::Input::KeyIdentifier RmlGLFW::ConvertKey( int glfw_key ) {
 	// clang-format off
 	switch (glfw_key)
 	{
