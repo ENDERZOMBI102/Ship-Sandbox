@@ -1,14 +1,14 @@
 <rml>
 	<head>
 		<style>
-			body {
-				font-family: Arial;
-			}
+            body {
+                font-family: Arial;
+                background-color: red;
+                opacity: 0.5;
+            }
 		</style>
 	</head>
 	<body>
-		<game>
-			<h2> <b> Hello World! </b> </h2>
-		</game>
+        <h2> <b> Hello World! </b> </h2>
 	</body>
 </rml>
