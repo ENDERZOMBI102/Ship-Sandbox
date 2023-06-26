@@ -26,6 +26,10 @@ add_executable( ShipSandbox
 	src/RmlBackend/RmlUi_Renderer_GL3.h
 	src/ShipSandbox.cpp
 	src/ShipSandbox.hpp
+	src/renderer/debug.hpp
+	src/renderer/debug.cpp
+	src/renderer/Renderer.hpp
+	src/renderer/Renderer.cpp
 )
 target_compile_definitions( ShipSandbox PRIVATE _CRT_SECURE_NO_WARNINGS )
 
@@ -41,8 +45,9 @@ find_package( PkgConfig REQUIRED )
 pkg_check_modules( DevIL IMPORTED_TARGET REQUIRED DevIL )
 pkg_check_modules( ILU IMPORTED_TARGET REQUIRED ILU )
 find_package( RmlUi CONFIG REQUIRED )
+find_package( spdlog CONFIG REQUIRED )
 
-target_link_libraries( ShipSandbox PRIVATE GLAD glfw JsonCpp::JsonCpp PkgConfig::DevIL PkgConfig::ILU RmlCore RmlDebugger )
+target_link_libraries( ShipSandbox PRIVATE GLAD glfw JsonCpp::JsonCpp PkgConfig::DevIL PkgConfig::ILU RmlCore RmlDebugger spdlog::spdlog spdlog::spdlog_header_only )
 
 if( WIN32 )
 	target_link_libraries( ShipSandbox PRIVATE opengl32 )
