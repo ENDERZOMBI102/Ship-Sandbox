@@ -30,6 +30,8 @@ add_executable( ShipSandbox
 	src/renderer/debug.cpp
 	src/renderer/Renderer.hpp
 	src/renderer/Renderer.cpp
+	src/renderer/buffers.hpp
+	src/renderer/buffers.cpp
 )
 target_compile_definitions( ShipSandbox PRIVATE _CRT_SECURE_NO_WARNINGS )
 

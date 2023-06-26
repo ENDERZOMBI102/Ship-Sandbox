@@ -18,7 +18,7 @@ namespace Renderer {
 
 	/**
 	 * Throws an exception if not called on the render thread.
-	 * @param message message for the exception.
+	 * @param text text for the exception.
 	 */
 	auto assertIsOnRenderThread( const std::string& message );
 
@@ -33,4 +33,14 @@ namespace Renderer {
 	 * @return true if it is, false otherwise.
 	 */
 	auto isInitialized() -> bool;
+
+	/**
+	 * Check for OpenGL errors.
+	 * @param file calling file.
+	 * @param func calling function.
+	 * @param line calling line.
+	 */
+	auto checkErrors( const char* file, const char* func, int line ) -> void;
 }// namespace engine
+
+#define CHECK_ERRORS() Renderer::checkErrors( __FILE_NAME__, __FUNCTION__, __LINE__ )

@@ -10,6 +10,7 @@
 
 #include "GLFW/glfw3.h"
 #include "Renderer.hpp"
+#include "debug.hpp"
 
 namespace Renderer {
 	static std::atomic<bool> initialized{ false };
@@ -60,5 +61,9 @@ namespace Renderer {
 
 	auto isInitialized() -> bool {
 		return initialized;
+	}
+
+	auto checkErrors( const char* file, const char* func, int line ) -> void {
+		renderer::Debug::update( file, func, line );
 	}
 }// namespace engine::renderer
