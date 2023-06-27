@@ -11,6 +11,7 @@
 #include "../src/renderer/Renderer.hpp"
 #include "../src/renderer/Shader.hpp"
 #include "../src/renderer/buffers.hpp"
+#include "../src/renderer/debug.hpp"
 #include "glad/glad.h"
 #include "glm/ext/matrix_transform.hpp"
 
@@ -43,6 +44,9 @@ int main() {
 		spdlog::critical( "Failed to initialize GLAD" )   ;
 		return -1;
 	}
+
+	// attach gl debugger
+	renderer::Debug::attach( window );
 
 	double lastTime = glfwGetTime();
 	int nframes = 0;
@@ -114,13 +118,12 @@ int main() {
 		if ( glfwGetTime() - lastTime > 1.0 ) {
 			lastTime = glfwGetTime();
 			glfwSetWindowTitle( window, std::format( "Renderer 2 - {} FPS", nframes ).c_str() );
-			spdlog::info( "time: {}", lastTime );
 			nframes = 0;
 		}
 
 		// --- RENDER ---
-		glClearColor( 0.2f, 0.3f, 0.3f, 1.0f );
-		glClear( GL_COLOR_BUFFER_BIT );
+		GL_CALL( glClearColor( 0.2f, 0.3f, 0.3f, 1.0f ) );
+		GL_CALL( glClear( GL_COLOR_BUFFER_BIT ) );
 
 		glm::mat4 trans{ 1.0f };
 		trans = glm::rotate( trans, static_cast<float>( lastTime ), glm::vec3{ 1.0f, 0.0f, 0.0f } );
@@ -129,7 +132,7 @@ int main() {
 		program.setMat4( "transform", trans );
 
 		vao.bind();
-		glDrawElements( GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr );
+		GL_CALL( glDrawElements( GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr ) );
 
 		glfwSwapBuffers( window );
 		glfwPollEvents();
