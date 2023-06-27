@@ -8,10 +8,10 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
+#include "../src/renderer/Renderer.hpp"
+#include "../src/renderer/Shader.hpp"
+#include "../src/renderer/buffers.hpp"
 #include "glad/glad.h"
-#include "renderer/Renderer.hpp"
-#include "renderer/Shader.hpp"
-#include "renderer/buffers.hpp"
 
 
 auto onScroll( GLFWwindow* window, double xOffset, double yOffset ) -> void { }

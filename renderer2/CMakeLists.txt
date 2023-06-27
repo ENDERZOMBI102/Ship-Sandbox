@@ -1,5 +1,4 @@
-add_executable( Renderer2
-	src/main.cpp
+add_library( Renderer2 STATIC
 	src/renderer/buffers.cpp
 	src/renderer/buffers.hpp
 	src/renderer/debug.cpp
@@ -10,20 +9,20 @@ add_executable( Renderer2
 	src/renderer/Shader.cpp
 	src/renderer/Shader.hpp
 )
-target_compile_definitions( Renderer2 PRIVATE _CRT_SECURE_NO_WARNINGS GLFW_INCLUDE_NONE )
+target_compile_definitions( Renderer2 PUBLIC _CRT_SECURE_NO_WARNINGS GLFW_INCLUDE_NONE )
 
-if ( UNIX )
-	list( APPEND CMAKE_PREFIX_PATH "/home/linuxbrew/.linuxbrew/opt/glfw" )
-endif()
 find_package( GLFW3 CONFIG REQUIRED )
 find_package( spdlog CONFIG REQUIRED )
 find_package( spdlog CONFIG REQUIRED )
 find_package( glm CONFIG REQUIRED )
 
-target_link_libraries( Renderer2 PRIVATE GLAD glfw spdlog::spdlog spdlog::spdlog_header_only glm::glm )
+target_link_libraries( Renderer2 PUBLIC GLAD glfw spdlog::spdlog spdlog::spdlog_header_only glm::glm )
 
 if( WIN32 )
 	target_link_libraries( Renderer2 PRIVATE opengl32 )
 else()
 	target_link_libraries( Renderer2 PRIVATE m GL )
 endif()
+
+add_executable( Renderer2_test test/main.cpp )
+target_link_libraries( Renderer2_test PRIVATE Renderer2 )
