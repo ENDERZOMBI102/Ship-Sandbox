@@ -10,56 +10,14 @@
 
 #include "glad/glad.h"
 #include "renderer/Renderer.hpp"
+#include "renderer/Shader.hpp"
+#include "renderer/buffers.hpp"
 
 
 auto onScroll( GLFWwindow* window, double xOffset, double yOffset ) -> void { }
 auto onCursorPos( GLFWwindow* window, double xPos, double yPos ) -> void { }
 auto onKey( GLFWwindow* window, int key, int scancode, int action, int mods ) -> void { }
 auto onMouseBtn( GLFWwindow* window, int button, int action, int mods ) -> void { }
-
-
-auto createShader( const char* code, GLenum type ) -> std::optional<GLuint> {
-	auto shader = glCreateShader( type );
-	glShaderSource( shader, 1, &code, nullptr );
-	glCompileShader( shader );
-
-	int success;
-	glGetShaderiv( shader, GL_COMPILE_STATUS, &success );
-	if ( success )
-		return shader;
-
-	char infoLog[512];
-	glGetShaderInfoLog( shader, 512, nullptr, infoLog );
-	spdlog::critical( "Failed to compile {} shader:\n{}", type == GL_VERTEX_SHADER ? "vertex" : "fragment", infoLog );
-	return std::nullopt;
-}
-
-auto createProgram( const char* vtx, const char* frg ) -> std::optional<GLuint> {
-	auto vertShader = createShader( vtx, GL_VERTEX_SHADER );
-	if (! vertShader )
-		return std::nullopt;
-
-	auto fragShader = createShader( frg, GL_FRAGMENT_SHADER );
-	if (! fragShader )
-		return std::nullopt;
-
-	auto program = glCreateProgram();
-	glAttachShader( program, *vertShader );
-	glAttachShader( program, *fragShader );
-	glLinkProgram( program );
-	glDeleteShader( *vertShader );
-	glDeleteShader( *fragShader );
-
-	int success;
-	glGetProgramiv( program, GL_LINK_STATUS, &success );
-	if ( success )
-		return program;
-
-	char infoLog[512];
-	glGetProgramInfoLog( program, 512, nullptr, infoLog );
-	spdlog::critical( "Failed to link program:\n{}", infoLog );
-	return std::nullopt;
-}
 
 
 int main() {
@@ -115,9 +73,7 @@ int main() {
 		}
 	)";
 
-	auto program = createProgram( vxShader, fxShader );
-	if (! program )
-		return 1;
+	renderer::Shader program{ vxShader, fxShader };
 
 	// --- DATA ---
 	float vertices[] = {
@@ -131,23 +87,16 @@ int main() {
 	};
 
 	// --- BUFFERS ---
-	GLuint vao;
-	glGenVertexArrays( 1, &vao );
-
-	GLuint vbo;
-	glGenBuffers( 1, &vbo );
-
-	GLuint ebo;
-	glGenBuffers( 1, &ebo );
+	renderer::VertexArray vao{};
+	renderer::VertexBuffer vbo{ GL_STATIC_DRAW };
+	renderer::ElementArrayBuffer ebo{ GL_STATIC_DRAW };
 
 	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-	glBindVertexArray( vao );
+	vao.bind();
 
-	glBindBuffer( GL_ARRAY_BUFFER, vbo );
-	glBufferData( GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW );
+	vbo.data( sizeof(vertices), vertices );
 
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, ebo );
-	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW );
+	ebo.data( sizeof(indices), indices );
 
 	glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>( 0 ) );
 	glEnableVertexAttribArray( 0 );
@@ -169,9 +118,9 @@ int main() {
 		glClearColor( 0.2f, 0.3f, 0.3f, 1.0f );
 		glClear( GL_COLOR_BUFFER_BIT );
 
-		glUseProgram( *program );
+		program.bind();
 
-		glBindVertexArray( vao );
+		vao.bind();
 		glDrawElements( GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr );
 
 		glfwSwapBuffers( window );

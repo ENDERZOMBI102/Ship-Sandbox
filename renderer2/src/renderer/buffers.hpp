@@ -8,27 +8,48 @@
 #include <initializer_list>
 #include <vector>
 
-#include "../util/stringable.hpp"
 #include "glad/glad.h"
 
+#include "../util/stringable.hpp"
 
-class ElementArrayBuffer : public ToString {
-	GLuint _handle{0};
-	bool hasData{ false };
-	int _count;
-public:
-	ElementArrayBuffer( std::initializer_list<int> indicies );
-	~ElementArrayBuffer();
 
-	auto update( std::initializer_list<int> indicies ) -> void;
-	template<size_t count>
-	auto update( std::array<int, count> indicies ) -> void;
-	auto update( const std::vector<int>& indicies ) -> void;
+namespace renderer {
+	class VertexArray : public ToString {
+		GLuint _handle{0};
+	public:
+		VertexArray();
+		~VertexArray();
 
-	auto bind() -> void;
+		auto bind() const -> void;
 
-	auto getElementCount() -> int;
-	auto isReady() -> bool;
+		auto toString() -> std::string override;
+	};
 
-	auto toString() -> std::string override;
-};
+	class VertexBuffer : public ToString {
+		GLuint _handle{0};
+		GLenum _usage;
+	public:
+		explicit VertexBuffer( GLenum usage );
+		~VertexBuffer();
+
+		auto bind() const -> void;
+
+		auto data( GLsizeiptr size, void* data ) const -> void;
+
+		auto toString() -> std::string override;
+	};
+
+	class ElementArrayBuffer : public ToString {
+		GLuint _handle{0};
+		GLenum _usage;
+	public:
+		explicit ElementArrayBuffer( GLenum usage );
+		~ElementArrayBuffer();
+
+		auto bind() const -> void;
+
+		auto data( GLsizeiptr size, void* data ) const -> void;
+
+		auto toString() -> std::string override;
+	};
+}

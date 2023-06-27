@@ -1,44 +1,81 @@
 //
 // Created by ENDERZOMBI102 on 27/06/2023.
 //
-
-#include "buffers.hpp"
-#include <initializer_list>
+#include <format>
 
 #include "glad/glad.h"
+
 #include "Renderer.hpp"
+#include "buffers.hpp"
 
-ElementArrayBuffer::ElementArrayBuffer( std::initializer_list<int> indicies ) : _count( static_cast<int>( indicies.size() ) ) {
+
+// region -- VERTEX ARRAY ---
+
+renderer::VertexArray::VertexArray() {
+	GL_CALL( glGenVertexArrays( 1, &this->_handle ) );
+}
+
+renderer::VertexArray::~VertexArray() {
+	GL_CALL( glDeleteBuffers( 1, &this->_handle ) );
+}
+
+auto renderer::VertexArray::bind() const -> void {
+	GL_CALL( glBindVertexArray( this->_handle ) );
+}
+
+auto renderer::VertexArray::toString() -> std::string {
+	return std::format( "VertexArray{{_handle={}}}", this->_handle );
+}
+// endregion
+
+
+// region --- VERTEX BUFFER ---
+
+renderer::VertexBuffer::VertexBuffer( GLenum usage ) {
 	GL_CALL( glGenBuffers( 1, &this->_handle ) );
+	this->_usage = usage;
+}
+
+renderer::VertexBuffer::~VertexBuffer() {
+	GL_CALL( glDeleteBuffers( 1, &this->_handle ) );
+}
+
+auto renderer::VertexBuffer::bind() const -> void {
+	GL_CALL( glBindBuffer( GL_ARRAY_BUFFER, this->_handle ) );
+}
+
+auto renderer::VertexBuffer::data( GLsizeiptr size, void* data ) const -> void {
 	this->bind();
-//	GL_CALL( glBufferData( GL_ELEMENT_ARRAY_BUFFER, 200, GL_DYNAMIC_DRAW ) );
-	if ( this->_count )
-		this->update( indicies );
+	GL_CALL( glBufferData( GL_ARRAY_BUFFER, size, data, this->_usage ) );
 }
 
-ElementArrayBuffer::~ElementArrayBuffer() {
-	glDeleteBuffers( 1, &this->_handle );
+auto renderer::VertexBuffer::toString() -> std::string {
+	return std::format( "VertexBuffer{{_handle={}}}", this->_handle );
+}
+// endregion
+
+
+// region --- ELEMENT ARRAY BUFFER ---
+
+renderer::ElementArrayBuffer::ElementArrayBuffer( GLenum usage ) {
+	GL_CALL( glGenBuffers( 1, &this->_handle ) );
+	this->_usage = usage;
 }
 
-auto ElementArrayBuffer::update( std::initializer_list<int> indicies ) -> void {
-
-}
-auto ElementArrayBuffer::update( const std::vector<int>& indicies ) -> void {
-
-}
-template< size_t count >
-auto ElementArrayBuffer::update( std::array<int, count> indicies ) -> void {
-
+renderer::ElementArrayBuffer::~ElementArrayBuffer() {
+	GL_CALL( glDeleteBuffers( 1, &this->_handle ) );
 }
 
-auto ElementArrayBuffer::bind() -> void {
-
+auto renderer::ElementArrayBuffer::bind() const -> void {
+	GL_CALL( glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, this->_handle ) );
 }
 
-auto ElementArrayBuffer::getElementCount() -> int {
-	return 0;
+auto renderer::ElementArrayBuffer::data( GLsizeiptr size, void* data ) const -> void {
+	this->bind();
+	GL_CALL( glBufferData( GL_ELEMENT_ARRAY_BUFFER, size, data, this->_usage ) );
 }
 
-auto ElementArrayBuffer::toString() -> std::string {
-	return "";
+auto renderer::ElementArrayBuffer::toString() -> std::string {
+	return std::format( "ElementArrayBuffer{{_handle={}}}", this->_handle );
 }
+// endregion

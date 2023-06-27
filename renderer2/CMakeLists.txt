@@ -6,8 +6,9 @@ add_executable( Renderer2
 	src/renderer/debug.hpp
 	src/renderer/Renderer.cpp
 	src/renderer/Renderer.hpp
-	src/util/stringable.cpp
 	src/util/stringable.hpp
+	src/renderer/Shader.cpp
+	src/renderer/Shader.hpp
 )
 target_compile_definitions( Renderer2 PRIVATE _CRT_SECURE_NO_WARNINGS GLFW_INCLUDE_NONE )
 

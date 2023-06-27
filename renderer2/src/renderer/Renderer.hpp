@@ -44,4 +44,7 @@ namespace Renderer {
 	auto checkErrors( const char* file, const char* func, int line ) -> void;
 }// namespace engine
 
-#define GL_CALL(expr) expr; Renderer::checkErrors( __FILE__, __FUNCTION__, __LINE__ )
+
+#define GL_CALL( stmt ) \
+	stmt;               \
+	Renderer::checkErrors( __FILE__, __FUNCTION__, __LINE__ )

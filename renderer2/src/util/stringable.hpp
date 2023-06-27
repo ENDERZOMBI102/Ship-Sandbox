@@ -8,5 +8,6 @@
 
 
 class ToString {
-	virtual auto toString() -> std::string;
+public:
+	virtual auto toString() -> std::string = 0;
 };
