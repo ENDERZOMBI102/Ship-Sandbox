@@ -4,8 +4,10 @@
 
 #pragma once
 
-#include "glad/glad.h"
 #include <string>
+
+#include "glm/glm.hpp"
+#include "glad/glad.h"
 
 namespace renderer {
 	class Shader {
@@ -19,5 +21,6 @@ namespace renderer {
 		auto setBool( const std::string& name, bool value ) const -> void;
 		auto setInt( const std::string& name, int value ) const -> void;
 		auto setFloat( const std::string& name, float value ) const -> void;
+		auto setMat4( const std::string& name, glm::mat4 value ) const -> void;
 	};
 }// namespace renderer

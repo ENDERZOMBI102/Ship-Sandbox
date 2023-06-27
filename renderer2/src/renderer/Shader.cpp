@@ -2,8 +2,10 @@
 // Created by ENDERZOMBI102 on 27/06/2023.
 //
 
-#include "Shader.hpp"
 #include "spdlog/spdlog.h"
+#include "glm/gtc/type_ptr.hpp"
+
+#include "Shader.hpp"
 
 auto createShader( const char* code, GLenum type ) -> GLuint {
 	auto shader = glCreateShader( type );
@@ -50,14 +52,18 @@ auto renderer::Shader::bind() const -> void {
 	glUseProgram( this->_handle );
 }
 
-void renderer::Shader::setBool( const std::string &name, bool value ) const {
+void renderer::Shader::setBool( const std::string& name, bool value ) const {
 	glUniform1i( glGetUniformLocation( this->_handle, name.c_str() ), static_cast<int>( value ) );
 }
 
-void renderer::Shader::setInt( const std::string &name, int value ) const {
+void renderer::Shader::setInt( const std::string& name, int value ) const {
 	glUniform1i( glGetUniformLocation( this->_handle, name.c_str() ), value );
 }
 
-void renderer::Shader::setFloat( const std::string &name, float value ) const {
+void renderer::Shader::setFloat( const std::string& name, float value ) const {
 	glUniform1f( glGetUniformLocation( this->_handle, name.c_str() ), value );
+}
+
+auto renderer::Shader::setMat4( const std::string& name, glm::mat4 value ) const -> void {
+	glUniformMatrix4fv( glGetUniformLocation( this->_handle, name.c_str() ), 1, GL_FALSE, glm::value_ptr( value ) );
 }

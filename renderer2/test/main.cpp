@@ -12,6 +12,7 @@
 #include "../src/renderer/Shader.hpp"
 #include "../src/renderer/buffers.hpp"
 #include "glad/glad.h"
+#include "glm/ext/matrix_transform.hpp"
 
 
 auto onScroll( GLFWwindow* window, double xOffset, double yOffset ) -> void { }
@@ -53,10 +54,12 @@ int main() {
 		layout (location = 0) in vec3 iPos;
 		layout (location = 1) in vec4 iColor;
 
+		uniform mat4 transform;
+
 		out vec4 vertexColor;
 
 		void main() {
-			gl_Position = vec4( iPos, 1.0 );
+			gl_Position = transform * vec4( iPos, 1.0 );
 			vertexColor = iColor;
 		}
 	)";
@@ -105,12 +108,13 @@ int main() {
 
 	// --- MAIN LOOP ---
 	glfwShowWindow( window );
-	glfwSwapInterval( 0 );
+	glfwSwapInterval( 1 );
 	while ( !glfwWindowShouldClose( window ) ) {
 		nframes++;
 		if ( glfwGetTime() - lastTime > 1.0 ) {
 			lastTime = glfwGetTime();
 			glfwSetWindowTitle( window, std::format( "Renderer 2 - {} FPS", nframes ).c_str() );
+			spdlog::info( "time: {}", lastTime );
 			nframes = 0;
 		}
 
@@ -118,7 +122,11 @@ int main() {
 		glClearColor( 0.2f, 0.3f, 0.3f, 1.0f );
 		glClear( GL_COLOR_BUFFER_BIT );
 
+		glm::mat4 trans{ 1.0f };
+		trans = glm::rotate( trans, static_cast<float>( lastTime ), glm::vec3{ 1.0f, 0.0f, 0.0f } );
+
 		program.bind();
+		program.setMat4( "transform", trans );
 
 		vao.bind();
 		glDrawElements( GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr );
