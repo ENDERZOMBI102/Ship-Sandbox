@@ -16,26 +16,21 @@ add_executable( ShipSandbox
 	src/render.hpp
 	src/scheduler.cpp
 	src/scheduler.h
-	src/util.cpp
-	src/util.hpp
-	src/vec.cpp
-	src/vec.hpp
+	src/util/util.cpp
+	src/util/util.hpp
+	src/util/vec.cpp
+	src/util/vec.hpp
 	src/RmlBackend/RmlUi_Platform_GLFW.cpp
 	src/RmlBackend/RmlUi_Platform_GLFW.h
 	src/RmlBackend/RmlUi_Renderer_GL3.cpp
 	src/RmlBackend/RmlUi_Renderer_GL3.h
 	src/ShipSandbox.cpp
 	src/ShipSandbox.hpp
-	src/renderer/debug.hpp
-	src/renderer/debug.cpp
-	src/renderer/Renderer.hpp
-	src/renderer/Renderer.cpp
-	src/renderer/buffers.hpp
-	src/renderer/buffers.cpp
 )
 target_compile_definitions( ShipSandbox PRIVATE _CRT_SECURE_NO_WARNINGS )
 
 add_subdirectory( vendor/glad )
+add_subdirectory( renderer2 )
 
 if ( UNIX )
 	list( APPEND CMAKE_PREFIX_PATH "/home/linuxbrew/.linuxbrew/opt/glfw" )

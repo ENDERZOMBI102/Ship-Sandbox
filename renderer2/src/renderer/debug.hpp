@@ -8,5 +8,5 @@
 namespace renderer::Debug {
 	auto attach( const GLFWwindow* window ) -> void;
 
-	auto update( char* file, char* func, int line ) -> void;
+	auto update( const char* file, const char* func, int line ) -> void;
 }

@@ -13,8 +13,9 @@ namespace Renderer {
 	 *  - Mark the current thread as the render thread.<br/>
 	 *  - Set the required OpenGL version.<br/>
 	 *  - Log some information.
+	 *  @returns true if initialized, false otherwise.
 	 */
-	auto init() -> void;
+	auto init() -> bool;
 
 	/**
 	 * Throws an exception if not called on the render thread.
@@ -43,4 +44,4 @@ namespace Renderer {
 	auto checkErrors( const char* file, const char* func, int line ) -> void;
 }// namespace engine
 
-#define CHECK_ERRORS() Renderer::checkErrors( __FILE_NAME__, __FUNCTION__, __LINE__ )
+#define GL_CALL(expr) expr; Renderer::checkErrors( __FILE__, __FUNCTION__, __LINE__ )

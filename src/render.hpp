@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vec.hpp"
+#include "util/vec.hpp"
 
 namespace render {
 	void triangle( vec2f a, vec2f b, vec2f c );

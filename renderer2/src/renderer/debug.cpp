@@ -33,7 +33,7 @@ namespace renderer::Debug {
 		glDebugMessageCallbackARB( logMessage, window );
 	}
 
-	auto update( char* file, char* func, int line ) -> void {
+	auto update( const char* file, const char* func, int line ) -> void {
 		if ( lastMessage.text == nullptr )
 			return;
 

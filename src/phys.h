@@ -2,7 +2,7 @@
 
 #include "Material.hpp"
 #include "scheduler.h"
-#include "vec.hpp"
+#include "util/vec.hpp"
 #include <map>
 #include <set>
 #include <vector>

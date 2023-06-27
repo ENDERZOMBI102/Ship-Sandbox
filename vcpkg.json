@@ -6,8 +6,8 @@
 	  { "name": "devil"   },
 	  { "name": "glfw3"   },
 	  { "name": "jsoncpp" },
-	  { "name": "spdlog" },
-	  { "name": "glm" },
+	  { "name": "spdlog"  },
+	  { "name": "glm"     },
 	  { "name": "rmlui"   }
   ],
   "overrides" : [

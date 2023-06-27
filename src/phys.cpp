@@ -96,7 +96,7 @@ void phys::world::render( double left, double right, double bottom, double top )
 	if ( !quickwaterfix )
 		renderWater( left, right, bottom, top );
 	glBegin( GL_LINES );
-	glLineWidth( 1.f );
+		glLineWidth( 1.f );
 	glEnd();
 	//buildBVHTree(true, points, collisionTree);
 }
@@ -152,10 +152,10 @@ void phys::world::renderLand( double left, double right, double bottom, double t
 	double slicewidth = ( right - left ) / 200.0;
 	for ( double slicex = left; slicex < right; slicex += slicewidth ) {
 		glBegin( GL_TRIANGLE_STRIP );
-		glVertex3f( slicex, oceanfloorheight( slicex ), -1 );
-		glVertex3f( slicex + slicewidth, oceanfloorheight( slicex + slicewidth ), -1 );
-		glVertex3f( slicex, bottom, -1 );
-		glVertex3f( slicex + slicewidth, bottom, -1 );
+			glVertex3f( slicex, oceanfloorheight( slicex ), -1 );
+			glVertex3f( slicex + slicewidth, oceanfloorheight( slicex + slicewidth ), -1 );
+			glVertex3f( slicex, bottom, -1 );
+			glVertex3f( slicex + slicewidth, bottom, -1 );
 		glEnd();
 	}
 }
@@ -166,10 +166,10 @@ void phys::world::renderWater( double left, double right, double bottom, double 
 	double slicewidth = ( right - left ) / 100.0;
 	for ( double slicex = left; slicex < right; slicex += slicewidth ) {
 		glBegin( GL_TRIANGLE_STRIP );
-		glVertex3f( slicex, waterheight( slicex ), -1 );
-		glVertex3f( slicex + slicewidth, waterheight( slicex + slicewidth ), -1 );
-		glVertex3f( slicex, bottom, -1 );
-		glVertex3f( slicex + slicewidth, bottom, -1 );
+			glVertex3f( slicex, waterheight( slicex ), -1 );
+			glVertex3f( slicex + slicewidth, waterheight( slicex + slicewidth ), -1 );
+			glVertex3f( slicex, bottom, -1 );
+			glVertex3f( slicex + slicewidth, bottom, -1 );
 		glEnd();
 	}
 }
@@ -297,8 +297,8 @@ void phys::point::render() const {
 	// Put a blue blob on leaking nodes (was more for debug purposes, but looks better IMO)
 	if ( isLeaking ) {
 		glColor3f( 0, 0, 1 );
-		glBegin( GL_POINTS );
-		glVertex3f( pos.x, pos.y, -1 );
+			glBegin( GL_POINTS );
+			glVertex3f( pos.x, pos.y, -1 );
 		glEnd();
 	}
 }
@@ -389,14 +389,14 @@ void phys::spring::damping( double amount ) {
 void phys::spring::render( bool showStress ) {
 	// If a member is heavily stressed, highlight it in red (ignored if the world's showstress field is false)
 	glBegin( GL_LINES );
-	if ( showStress )
-		glColor3f( 1, 0, 0 );
-	else
-		render::setColour( a->getColor( mtl->color ) );
-	glVertex3f( a->pos.x, a->pos.y, -1 );
-	if ( !showStress )
-		render::setColour( b->getColor( mtl->color ) );
-	glVertex3f( b->pos.x, b->pos.y, -1 );
+		if ( showStress )
+			glColor3f( 1, 0, 0 );
+		else
+			render::setColour( a->getColor( mtl->color ) );
+		glVertex3f( a->pos.x, a->pos.y, -1 );
+		if ( !showStress )
+			render::setColour( b->getColor( mtl->color ) );
+		glVertex3f( b->pos.x, b->pos.y, -1 );
 	glEnd();
 }
 
